@@ -38,13 +38,32 @@ class MainActivity : AppCompatActivity() {
             result_viewer.text = d.toString()
         }
         result_btn.setOnClickListener {
-            openDevice(manager)
+            connectDevice(manager)
+//            openDevice(manager)
         }
 
 
 
 
     }
+    fun connectDevice(manager : UsbManager){
+        val driverList : List<UsbSerialDriver> = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
+        if (driverList.isEmpty()){
+            return
+        }
+        val driver :UsbSerialDriver = driverList.get(0)
+        val device = driver.device
+        list_viewer.text = device.interfaceCount.toString()
+        device.getInterface(0).also { intf ->
+            intf.getEndpoint(0).also { endpoint ->
+                manager.openDevice(device).apply {
+                    claimInterface(intf, true)
+                }
+            }
+        }
+    }
+
+
     fun openDevice(manager : UsbManager){
         val driverList : List<UsbSerialDriver> = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
         if (driverList.isEmpty()){
