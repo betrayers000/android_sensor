@@ -62,9 +62,9 @@ class MainActivity : AppCompatActivity() {
         port.open(connection)
         port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
         var buffer  = ByteArray(30)
-        val len = port.read(buffer, 3000)
+        val len = port.read(buffer, 1000)
         result_viewer.text = len.toString()
-        result_viewer2.text = String(buffer, Charsets.UTF_8)
+        result_viewer2.text = HexDump.dumpHexString(buffer)
     }
 
     private val usbReceiver = object : BroadcastReceiver() {
