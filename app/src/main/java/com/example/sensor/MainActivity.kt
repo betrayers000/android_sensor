@@ -20,22 +20,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-
         var result : StringBuilder = StringBuilder()
-
         val manager = getSystemService(Context.USB_SERVICE) as UsbManager
-        val permissionIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
-        val filter = IntentFilter(ACTION_USB_PERMISSION)
-        registerReceiver(usbReceiver, filter)
 
-        if (device != null){
-            manager.requestPermission(device, permissionIntent)
-        }
+
+
 
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
         deviceList.values.forEach { d ->
-            result.append(d.toString())
+            val permissionIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
+            val filter = IntentFilter(ACTION_USB_PERMISSION)
+            registerReceiver(usbReceiver, filter)
+            manager.requestPermission(d, permissionIntent)
+            result.append(d.deviceName)
         }
         result_btn.setOnClickListener {
             result_viewer.text = result.toString()
@@ -53,15 +50,18 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
+                            result_viewer.text = device.deviceName
                         }
                     } else {
                         Log.d("device", "permission denied for device $device")
                     }
-                    if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
-                        device?.apply {
-                            // call your method that cleans up and closes communication with the device
-                        }
-                    }
+
+                }
+            }
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
+                val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
+                device?.apply {
+                    // call your method that cleans up and closes communication with the device
                 }
             }
         }
