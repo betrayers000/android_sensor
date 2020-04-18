@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
         var buffer  = ByteArray(30)
         val len = port.read(buffer, 1000)
-        result_viewer.text = len.toString()
+        result_viewer.text = buffer.size.toString()
         result_viewer2.text = HexDump.dumpHexString(buffer)
     }
 
