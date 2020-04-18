@@ -15,6 +15,7 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
+import java.nio.charset.Charset
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,7 +39,9 @@ class MainActivity : AppCompatActivity() {
             result_viewer.text = d.toString()
         }
         result_btn.setOnClickListener {
-            connectDevice(manager)
+            Thread(Runnable {
+                connectDevice(manager)
+            }).start()
 //            openDevice(manager)
         }
 
@@ -60,9 +63,11 @@ class MainActivity : AppCompatActivity() {
                 manager.openDevice(device).apply {
                     claimInterface(intf, true)
                     bulkTransfer(endpoint, buffer, buffer.size, 1000)
+                    close()
                 }
             }
         }
+        result_viewer2.text = buffer.toString()
     }
 
 
