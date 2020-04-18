@@ -56,9 +56,8 @@ class MainActivity : AppCompatActivity() {
         val port : UsbSerialPort = driver.ports.get(0)
         port.open(connection)
         port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-        var buffer  = ByteArray(8192)
-        val len = port.read(buffer, 30)
-        var result = StringBuilder()
+        var buffer  = ByteArray(30)
+        val len = port.read(buffer, 3000)
         result_viewer.text = len.toString()
         result_viewer2.text = String(buffer, Charsets.UTF_8)
     }
