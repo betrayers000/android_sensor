@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         if (driverList.isEmpty()){
             return
         }
+        lateinit var buffer : ByteArray
         val driver :UsbSerialDriver = driverList.get(0)
         val device = driver.device
         list_viewer.text = device.interfaceCount.toString()
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             intf.getEndpoint(0).also { endpoint ->
                 manager.openDevice(device).apply {
                     claimInterface(intf, true)
+                    bulkTransfer(endpoint, buffer, buffer.size, 1000)
                 }
             }
         }
