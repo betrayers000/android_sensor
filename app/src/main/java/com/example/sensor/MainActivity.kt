@@ -50,6 +50,11 @@ class MainActivity : AppCompatActivity() {
         if (driverList.isEmpty()){
             return
         }
+        var builder = StringBuilder()
+        driverList.forEach { driver ->
+            builder.append(driver.device.deviceName)
+        }
+        list_viewer.text = builder
         val driver :UsbSerialDriver = driverList.get(0)
         val connection : UsbDeviceConnection = manager.openDevice(driver.device)
 
