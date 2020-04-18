@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,12 +20,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
 
-        result_btn.setOnClickListener {
-            result_viewer.text = device.toString()
-        }
+        var result : StringBuilder = StringBuilder()
 
         val manager = getSystemService(Context.USB_SERVICE) as UsbManager
         val permissionIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
@@ -35,6 +33,13 @@ class MainActivity : AppCompatActivity() {
             manager.requestPermission(device, permissionIntent)
         }
 
+        val deviceList : HashMap<String, UsbDevice> = manager.deviceList
+        deviceList.values.forEach { d ->
+            result.append(d.toString())
+        }
+        result_btn.setOnClickListener {
+            result_viewer.text = result.toString()
+        }
 
     }
 
