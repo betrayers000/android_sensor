@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             val filter = IntentFilter(ACTION_USB_PERMISSION)
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
-            result.append(d.deviceName)
+            result.append(d.toString())
             result_viewer.text = d.toString()
         }
 
