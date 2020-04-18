@@ -22,36 +22,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         var result : StringBuilder = StringBuilder()
         val manager = getSystemService(Context.USB_SERVICE) as UsbManager
-        lateinit var device : UsbDevice
-
 
 
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
         deviceList.values.forEach { d ->
-            if (d.deviceName.equals("/dev/bus/usb/001/003")){
-                val permissionIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
-                val filter = IntentFilter(ACTION_USB_PERMISSION)
-                registerReceiver(usbReceiver, filter)
-                manager.requestPermission(d, permissionIntent)
-                result.append(d.deviceName)
-                device = d
-            }
-        }
-        lateinit var bytes: ByteArray
-        val TIMEOUT = 0
-        val forceClaim = true
-        device.getInterface(0).also { intf ->
-            intf.getEndpoint(0).also { endpoint ->
-                manager.openDevice(device).apply {
-                    claimInterface(intf, forceClaim)
-                    bulkTransfer(endpoint, bytes, bytes.size
-                    , TIMEOUT)
-                }
-            }
+            val permissionIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
+            val filter = IntentFilter(ACTION_USB_PERMISSION)
+            registerReceiver(usbReceiver, filter)
+            manager.requestPermission(d, permissionIntent)
+            result.append(d.deviceName)
+            result_viewer.text = d.toString()
         }
 
         result_btn.setOnClickListener {
-            result_viewer.text = bytes.toString()
+            result_viewer.text = result.toString()
         }
 
     }
