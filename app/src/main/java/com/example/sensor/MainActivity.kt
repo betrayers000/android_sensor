@@ -6,10 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.hoho.android.usbserial.driver.UsbSerialDriver
+import com.hoho.android.usbserial.driver.UsbSerialPort
+import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -33,12 +37,29 @@ class MainActivity : AppCompatActivity() {
             result.append(d.toString())
             result_viewer.text = d.toString()
         }
-
         result_btn.setOnClickListener {
-            result_viewer.text = result.toString()
+            openDevice(manager)
         }
 
 
+
+
+    }
+    fun openDevice(manager : UsbManager){
+        val driverList : List<UsbSerialDriver> = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
+        if (driverList.isEmpty()){
+            return
+        }
+        val driver :UsbSerialDriver = driverList.get(0)
+        val connection : UsbDeviceConnection = manager.openDevice(driver.device)
+
+        val port : UsbSerialPort = driver.ports.get(0)
+        port.open(connection)
+        port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
+        val buffer  = ByteArray(8192)
+        val len = port.read(buffer, 30)
+        result_viewer.text = len.toString()
+        result_viewer2.text = buffer.toString()
     }
 
     private val usbReceiver = object : BroadcastReceiver() {
