@@ -30,7 +30,8 @@ class MainActivity : AppCompatActivity() {
             val filter = IntentFilter(ACTION_USB_PERMISSION)
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
-            result.append(d.deviceName)
+            result.append(d.toString())
+            result_viewer.text = d.toString()
         }
 
         result_btn.setOnClickListener {
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
-                            result_viewer.text = device.deviceName
+                            result_viewer.text = device.toString()
                         }
                     } else {
                         Log.d("device", "permission denied for device $device")
