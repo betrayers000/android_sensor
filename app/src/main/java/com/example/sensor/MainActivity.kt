@@ -50,10 +50,7 @@ class MainActivity : AppCompatActivity() {
             findDevice(manager)
             GlobalScope.launch {
                 if (check) {
-                    GlobalScope.launch {
-                        openDevice()
-                        delay(1000)
-                    }
+                    openDevice()
                 }
             }
         }
