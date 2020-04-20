@@ -36,10 +36,10 @@ class MainActivity : AppCompatActivity() {
         val result : StringBuilder = StringBuilder()
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
-
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
         deviceList.values.forEach { d ->
-            val permissionIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
+            val permissionIntent =
+                PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
             val filter = IntentFilter(ACTION_USB_PERMISSION)
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
@@ -49,8 +49,12 @@ class MainActivity : AppCompatActivity() {
         result_btn.setOnClickListener {
             findDevice(manager)
             GlobalScope.launch {
-                    openDevice()
-                    delay(1000)
+                if (check) {
+                    GlobalScope.launch {
+                        openDevice()
+                        delay(1000)
+                    }
+                }
             }
         }
 
@@ -99,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
-                            result_viewer.text = device.deviceName
+                            result_viewer.text = device.toString()
                         }
                     } else {
                         Log.d("device", "permission denied for device $device")
