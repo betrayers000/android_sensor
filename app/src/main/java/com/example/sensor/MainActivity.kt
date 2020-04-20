@@ -17,7 +17,6 @@ import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -29,6 +28,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var connection : UsbDeviceConnection
     lateinit var manager : UsbManager
     lateinit var port : UsbSerialPort
+    var len = -1
+    val buffer  = ByteArray(30)
+    val error = "len is zero"
     var check = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,26 +51,33 @@ class MainActivity : AppCompatActivity() {
         }
         result_btn.setOnClickListener {
             findDevice(manager)
-            val job = GlobalScope.launch(Dispatchers.Default) {
-                if (check) {
-                    openDevice()
+            openDevice()
+            GlobalScope.launch(Dispatchers.Default) {
+                while(check){
+                    readPort()
+                    GlobalScope.launch(Dispatchers.Main) {
+                        if (len > 0) {
+                            list_viewer.text = len.toString()
+                            result_viewer2.text = String(buffer)
+                            result_viewer.text = HexDump.Buff2String(buffer)
+                            len = 0
+                        }
+                    }
                 }
             }
-            cancel_btn.setOnClickListener {
-                job.cancel()
-            }
+
         }
 
+        cancel_btn.setOnClickListener {
 
-
-
+            check = false
+        }
 
     }
 
     fun findDevice(manager: UsbManager){
         driverList = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
         if (driverList.isEmpty()){
-            check = false
             return
         }
         val builder = StringBuilder()
@@ -82,17 +91,23 @@ class MainActivity : AppCompatActivity() {
 
 
     fun openDevice(){
-        val error = "len is zero"
-        port = driver.ports.get(0)
-        port.open(connection)
-        port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-        val buffer  = ByteArray(30)
-        val len = port.read(buffer, 1000)
-        if (len > 0){
-            result_viewer2.text = HexDump.dumpHexString(buffer)
-        } else {
-            result_viewer.text = error
+        if (driverList.isEmpty()){
+            return
         }
+        try {
+            port = driver.ports.get(0)
+            port.open(connection)
+            port.setParameters(19200, 8, 1, 0)
+        }catch (e : Exception){
+            result_viewer.text = e.toString()
+        }
+    }
+
+    fun readPort() {
+        if (driverList.isEmpty()){
+            return
+        }
+        len = port.read(buffer, 1000)
     }
 
     private val usbReceiver = object : BroadcastReceiver() {
