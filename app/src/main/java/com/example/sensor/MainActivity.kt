@@ -15,18 +15,27 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
-import java.nio.charset.Charset
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+    lateinit var driverList : List<UsbSerialDriver>
+    lateinit var driver :UsbSerialDriver
+    lateinit var connection : UsbDeviceConnection
+    lateinit var manager : UsbManager
+    lateinit var port : UsbSerialPort
+    var check = true
+    var check_cnt = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var result : StringBuilder = StringBuilder()
-        val manager = getSystemService(Context.USB_SERVICE) as UsbManager
+        val result : StringBuilder = StringBuilder()
+        manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
 
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
@@ -39,58 +48,52 @@ class MainActivity : AppCompatActivity() {
             result_viewer.text = d.toString()
         }
         result_btn.setOnClickListener {
-            Thread(Runnable {
-                connectDevice(manager)
-            }).start()
-//            openDevice(manager)
-        }
-
-
-
-
-    }
-    fun connectDevice(manager : UsbManager){
-        val driverList : List<UsbSerialDriver> = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
-        if (driverList.isEmpty()){
-            return
-        }
-        lateinit var buffer : ByteArray
-        val driver :UsbSerialDriver = driverList.get(0)
-        val device = driver.device
-        list_viewer.text = device.interfaceCount.toString()
-        device.getInterface(0).also { intf ->
-            intf.getEndpoint(0).also { endpoint ->
-                manager.openDevice(device).apply {
-                    claimInterface(intf, true)
-                    bulkTransfer(endpoint, buffer, buffer.size, 1000)
-                    close()
+            findDevice(manager)
+            check_cnt = 0
+            GlobalScope.launch {
+                while (check){
+                    openDevice()
+                    delay(1000)
                 }
             }
         }
-        result_viewer2.text = buffer.toString()
+
+
+
+
     }
 
-
-    fun openDevice(manager : UsbManager){
-        val driverList : List<UsbSerialDriver> = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
+    fun findDevice(manager: UsbManager){
+        driverList = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
         if (driverList.isEmpty()){
             return
         }
-        var builder = StringBuilder()
+        val builder = StringBuilder()
         driverList.forEach { driver ->
             builder.append(driver.device.deviceName)
         }
         list_viewer.text = builder
-        val driver :UsbSerialDriver = driverList.get(0)
-        val connection : UsbDeviceConnection = manager.openDevice(driver.device)
+        driver = driverList.get(0)
+        connection = manager.openDevice(driver.device)
+    }
 
-        val port : UsbSerialPort = driver.ports.get(0)
+
+    fun openDevice(){
+
+        port = driver.ports.get(0)
         port.open(connection)
         port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-        var buffer  = ByteArray(30)
+        val buffer  = ByteArray(16)
         val len = port.read(buffer, 1000)
         result_viewer.text = buffer.size.toString()
-        result_viewer2.text = HexDump.dumpHexString(buffer)
+        if (len > 0){
+            result_viewer2.text = HexDump.dumpHexString(buffer)
+        } else {
+            result_viewer2.text = "len is zero" + check_cnt.toString()
+            if (check_cnt > 10){
+                check = false
+            }
+        }
     }
 
     private val usbReceiver = object : BroadcastReceiver() {
