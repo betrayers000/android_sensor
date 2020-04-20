@@ -48,12 +48,16 @@ class MainActivity : AppCompatActivity() {
         }
         result_btn.setOnClickListener {
             findDevice(manager)
-            GlobalScope.launch {
+            val job = GlobalScope.launch {
                 if (check) {
                     openDevice()
                 }
             }
+            cancel_btn.setOnClickListener {
+                job.cancel()
+            }
         }
+
 
 
 
@@ -81,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         port = driver.ports.get(0)
         port.open(connection)
         port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-        val buffer  = ByteArray(16)
+        val buffer  = ByteArray(30)
         val len = port.read(buffer, 1000)
         if (len > 0){
             result_viewer2.text = HexDump.dumpHexString(buffer)
