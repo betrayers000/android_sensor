@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity() {
     fun findDevice(manager: UsbManager){
         driverList = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
         if (driverList.isEmpty()){
+            check = false
             return
         }
         val builder = StringBuilder()
