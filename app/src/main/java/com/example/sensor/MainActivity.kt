@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var manager : UsbManager
     lateinit var port : UsbSerialPort
     var check = true
-    var check_cnt = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         }
         result_btn.setOnClickListener {
             findDevice(manager)
-            check_cnt = 0
             GlobalScope.launch {
                     openDevice()
                     delay(1000)
@@ -78,20 +76,16 @@ class MainActivity : AppCompatActivity() {
 
 
     fun openDevice(){
-
+        val error = "len is zero"
         port = driver.ports.get(0)
         port.open(connection)
         port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
         val buffer  = ByteArray(16)
         val len = port.read(buffer, 1000)
-        result_viewer.text = buffer.size.toString()
         if (len > 0){
             result_viewer2.text = HexDump.dumpHexString(buffer)
         } else {
-            result_viewer2.text = "len is zero" + check_cnt.toString()
-            if (check_cnt > 10){
-                check = false
-            }
+            result_viewer.text = error
         }
     }
 
