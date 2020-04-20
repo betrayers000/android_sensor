@@ -51,10 +51,8 @@ class MainActivity : AppCompatActivity() {
             findDevice(manager)
             check_cnt = 0
             GlobalScope.launch {
-                while (check){
                     openDevice()
                     delay(1000)
-                }
             }
         }
 
