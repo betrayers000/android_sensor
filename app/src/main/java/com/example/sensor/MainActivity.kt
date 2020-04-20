@@ -50,9 +50,11 @@ class MainActivity : AppCompatActivity() {
         result_btn.setOnClickListener {
             findDevice(manager)
             check_cnt = 0
-            GlobalScope.launch {
+            if (check){
+                GlobalScope.launch {
                     openDevice()
                     delay(1000)
+                }
             }
         }
 
