@@ -51,10 +51,8 @@ class MainActivity : AppCompatActivity() {
             findDevice(manager)
             check_cnt = 0
             GlobalScope.launch {
-                while (check){
                     openDevice()
                     delay(1000)
-                }
             }
         }
 
@@ -66,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     fun findDevice(manager: UsbManager){
         driverList = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
         if (driverList.isEmpty()){
+            check = false
             return
         }
         val builder = StringBuilder()
