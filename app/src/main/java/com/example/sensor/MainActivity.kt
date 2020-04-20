@@ -15,6 +15,7 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         }
         result_btn.setOnClickListener {
             findDevice(manager)
-            val job = GlobalScope.launch {
+            val job = GlobalScope.launch(Dispatchers.Default) {
                 if (check) {
                     openDevice()
                 }
