@@ -15,9 +15,7 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -50,21 +48,72 @@ class MainActivity : AppCompatActivity() {
             result_viewer.text = d.toString()
         }
         result_btn.setOnClickListener {
+
+            val resultBuilder = StringBuilder()
+            var resultString = ""
             findDevice(manager)
             openDevice()
-            GlobalScope.launch(Dispatchers.Default) {
-                while(check){
-                    readPort()
-                    GlobalScope.launch(Dispatchers.Main) {
-                        if (len > 0) {
-                            list_viewer.text = len.toString()
-                            result_viewer2.text = String(buffer)
-                            result_viewer.text = HexDump.Buff2String(buffer)
-                            len = 0
+            result_viewer2.text = "start"
+            runBlocking {
+                launch(Dispatchers.IO){
+                    println("launch in runblocking")
+                    var cnt = 0
+                    while(!resultString.contains("\r\n")){
+                        cnt += 1
+                        readPort()
+                        if (len > 0){
+                            resultString += String(buffer, Charsets.US_ASCII)
                         }
+//                        if (cnt > 10){
+//                            break
+//                        }
+//                        println(cnt.toString())
                     }
+                    println("launch finish")
                 }
+                println("main thread ")
             }
+            println("after blocking")
+            result_viewer.text = resultString
+            result_viewer2.text = "check"
+//            GlobalScope.launch(Dispatchers.IO) {
+//                println("IO scope start")
+//                while(check){
+//                    println("IO scope -------------------")
+//                    readPort()
+//                    val resultBuilder = StringBuilder()
+//                    if (len > 0) {
+//                        val strBuffer = String(buffer, Charsets.US_ASCII)
+//                        resultBuilder.append(strBuffer)
+//                        if (strBuffer.contains("\r\n")){
+//                            output = resultBuilder.toString()
+//                            outputChk=true
+//                            resultBuilder.clear()
+//                        }
+//                    }
+//                    len = 0
+//                    println("===============check point===================")
+//                    val job = Job()
+//                    if (outputChk){
+//                        outputChk=false
+//                        GlobalScope.launch(Dispatchers.Main + job) {
+//                            println("Main Scope start ====== result_viewer2")
+//                            result_viewer2.text = output
+//                            delay(1)
+//                            job.cancel()
+//                        }
+//                    } else {
+//                        GlobalScope.launch(Dispatchers.Main + job) {
+//                            println("Main Scope start ====== result_viewer")
+//                            result_viewer.text = resultBuilder
+//                            delay(1)
+//                            job.cancel()
+//                        }
+//                    }
+//
+//                    job.join()
+//                }
+//            }
 
         }
 
@@ -97,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         try {
             port = driver.ports.get(0)
             port.open(connection)
-            port.setParameters(19200, 8, 1, 0)
+            port.setParameters(9600, 8, 1, 0)
         }catch (e : Exception){
             result_viewer.text = e.toString()
         }
