@@ -48,79 +48,74 @@ class MainActivity : AppCompatActivity() {
             result_viewer.text = d.toString()
         }
         result_btn.setOnClickListener {
-
-            val resultBuilder = StringBuilder()
-            var resultString = ""
-            findDevice(manager)
-            openDevice()
-            result_viewer2.text = "start"
-            runBlocking {
-                launch(Dispatchers.IO){
-                    println("launch in runblocking")
-                    var cnt = 0
-                    while(!resultString.contains("\r\n")){
-                        cnt += 1
-                        readPort()
-                        if (len > 0){
-                            resultString += String(buffer, Charsets.US_ASCII)
-                        }
-//                        if (cnt > 10){
-//                            break
-//                        }
-//                        println(cnt.toString())
-                    }
-                    println("launch finish")
-                }
-                println("main thread ")
-            }
-            println("after blocking")
-            result_viewer.text = resultString
-            result_viewer2.text = "check"
-//            GlobalScope.launch(Dispatchers.IO) {
-//                println("IO scope start")
-//                while(check){
-//                    println("IO scope -------------------")
-//                    readPort()
-//                    val resultBuilder = StringBuilder()
-//                    if (len > 0) {
-//                        val strBuffer = String(buffer, Charsets.US_ASCII)
-//                        resultBuilder.append(strBuffer)
-//                        if (strBuffer.contains("\r\n")){
-//                            output = resultBuilder.toString()
-//                            outputChk=true
-//                            resultBuilder.clear()
-//                        }
-//                    }
-//                    len = 0
-//                    println("===============check point===================")
-//                    val job = Job()
-//                    if (outputChk){
-//                        outputChk=false
-//                        GlobalScope.launch(Dispatchers.Main + job) {
-//                            println("Main Scope start ====== result_viewer2")
-//                            result_viewer2.text = output
-//                            delay(1)
-//                            job.cancel()
-//                        }
-//                    } else {
-//                        GlobalScope.launch(Dispatchers.Main + job) {
-//                            println("Main Scope start ====== result_viewer")
-//                            result_viewer.text = resultBuilder
-//                            delay(1)
-//                            job.cancel()
-//                        }
-//                    }
-//
-//                    job.join()
-//                }
-//            }
-
+            setstatus()
         }
 
         cancel_btn.setOnClickListener {
 
-            check = false
+            list_viewer.text  = "Ready"
+            result_viewer.text = "Ready"
+            result_viewer2.text = "Ready"
         }
+
+    }
+
+    fun setstatus(){
+        var resultString = ""
+        // O
+        var ppO2Val = ""
+        // T
+        var temperatureVal = ""
+        // P
+        var pressureVal = ""
+        // %
+        var O2Val = ""
+        // e
+        var statVal = ""
+
+        findDevice(manager)
+        openDevice()
+        runBlocking {
+            launch(Dispatchers.Default){
+                println("launch in runblocking")
+                var cnt = 0
+                while(!resultString.contains("\r\n")){
+                    cnt += 1
+                    val job = launch(Dispatchers.IO) {
+                        println("job start")
+                        readPort()
+                        if (len > 0){
+                            val convString = String(buffer, Charsets.UTF_8)
+                            if (convString.contains("O")){
+                                ppO2Val = convString
+                            } else if (convString.contains("T")){
+                                temperatureVal = convString
+                            } else if (convString.contains("%")){
+                                O2Val = convString
+                            } else if (convString.contains("e")){
+                                statVal = convString
+                            }
+                            if (convString.contains("\r\n")){
+                                resultString = convString
+                            }
+//                                resultString += String(buffer, Charsets.UTF_8)
+                        }
+                    }
+                    job.join()
+                    println("job end")
+//                        if (cnt > 10){
+//                            break
+//                        }
+//                        println(cnt.toString())
+                }
+                println("launch finish")
+            }
+            println("main thread ")
+        }
+        println("after blocking")
+        list_viewer.text = "last String : " + resultString
+        result_viewer.text = "complete String : " + ppO2Val + temperatureVal + pressureVal + O2Val + statVal
+        result_viewer2.text = "O2 value : " + O2Val
 
     }
 
@@ -156,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         if (driverList.isEmpty()){
             return
         }
-        len = port.read(buffer, 1000)
+        len = port.read(buffer, 10000)
     }
 
     private val usbReceiver = object : BroadcastReceiver() {
@@ -169,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
-                            result_viewer.text = device.toString()
+                            setstatus()
                         }
                     } else {
                         Log.d("device", "permission denied for device $device")
