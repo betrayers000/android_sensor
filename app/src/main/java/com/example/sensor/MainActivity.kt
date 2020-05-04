@@ -9,6 +9,7 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.hoho.android.usbserial.driver.UsbSerialDriver
@@ -16,6 +17,8 @@ import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,16 +29,17 @@ class MainActivity : AppCompatActivity() {
     lateinit var connection : UsbDeviceConnection
     lateinit var manager : UsbManager
     lateinit var port : UsbSerialPort
-    var len = -1
-    val buffer  = ByteArray(30)
+    lateinit var buffer : ByteArray
     val error = "len is zero"
     var check = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val result : StringBuilder = StringBuilder()
+
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
+
+        result_viewer.movementMethod = ScrollingMovementMethod()
 
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
         deviceList.values.forEach { d ->
@@ -44,10 +48,10 @@ class MainActivity : AppCompatActivity() {
             val filter = IntentFilter(ACTION_USB_PERMISSION)
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
-            result.append(d.toString())
-            result_viewer.text = d.toString()
+
         }
         result_btn.setOnClickListener {
+            connect()
             setstatus()
         }
 
@@ -56,67 +60,70 @@ class MainActivity : AppCompatActivity() {
             list_viewer.text  = "Ready"
             result_viewer.text = "Ready"
             result_viewer2.text = "Ready"
+            port.close()
         }
 
     }
 
-    fun setstatus(){
-        var resultString = ""
-        // O
-        var ppO2Val = ""
-        // T
-        var temperatureVal = ""
-        // P
-        var pressureVal = ""
-        // %
-        var O2Val = ""
-        // e
-        var statVal = ""
-
+    fun connect(){
         findDevice(manager)
         openDevice()
+    }
+
+    fun setstatus(){
+        // O
+        var ppO2Val = arrayListOf<String>()
+        // T
+        var temperatureVal = arrayListOf<String>()
+        // P
+        var pressureVal = arrayListOf<String>()
+        // %
+        var O2Val = arrayListOf<String>()
+        // e
+        var statVal = arrayListOf<String>()
+        var resultString = ""
         runBlocking {
-            launch(Dispatchers.Default){
+            val job = launch(Dispatchers.Default) {
                 println("launch in runblocking")
                 var cnt = 0
-                while(!resultString.contains("\r\n")){
+                var check = true
+                while (check) {
                     cnt += 1
                     val job = launch(Dispatchers.IO) {
                         println("job start")
-                        readPort()
-                        if (len > 0){
-                            val convString = String(buffer, Charsets.UTF_8)
-                            if (convString.contains("O")){
-                                ppO2Val = convString
-                            } else if (convString.contains("T")){
-                                temperatureVal = convString
-                            } else if (convString.contains("%")){
-                                O2Val = convString
-                            } else if (convString.contains("e")){
-                                statVal = convString
+                        val len = readPort()
+                        if (len > 1) {
+                            val byteArray = Arrays.copyOf(buffer, len)
+                            val encode = String(byteArray, Charsets.UTF_8)
+                            resultString += encode
+                            if (encode.contains("\r\n")) {
+                                display("finish point ")
+                                check = false
                             }
-                            if (convString.contains("\r\n")){
-                                resultString = convString
-                            }
-//                                resultString += String(buffer, Charsets.UTF_8)
                         }
                     }
                     job.join()
+                    delay(10)
                     println("job end")
-//                        if (cnt > 10){
-//                            break
-//                        }
-//                        println(cnt.toString())
+//                    if (cnt > 200){
+//                        break
+//                    }
+//                    println(cnt.toString())
+                }
+
+                if (resultString != ""){
+                    display("full : " + resultString)
+                    display(resultString.split("").toString())
                 }
                 println("launch finish")
             }
+            job.join()
             println("main thread ")
         }
         println("after blocking")
-        list_viewer.text = "last String : " + resultString
-        result_viewer.text = "complete String : " + ppO2Val + temperatureVal + pressureVal + O2Val + statVal
-        result_viewer2.text = "O2 value : " + O2Val
-
+//        list_viewer.text = "last String : " + resultString
+//        result_viewer.text = "complete String : " + ppO2Val + temperatureVal + pressureVal + O2Val + statVal
+//        result_viewer2.text = "stat value : " + statVal
     }
 
     fun findDevice(manager: UsbManager){
@@ -147,11 +154,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun readPort() {
+    fun readPort() : Int{
+        buffer = ByteArray(32)
         if (driverList.isEmpty()){
-            return
+            return 0
         }
-        len = port.read(buffer, 10000)
+        return port.read(buffer,1000)
     }
 
     private val usbReceiver = object : BroadcastReceiver() {
@@ -164,7 +172,12 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
-                            setstatus()
+                            connect()
+                            for (i in 0..10){
+
+                                setstatus()
+                                display("now count : " + i.toString())
+                            }
                         }
                     } else {
                         Log.d("device", "permission denied for device $device")
@@ -178,6 +191,11 @@ class MainActivity : AppCompatActivity() {
                     // call your method that cleans up and closes communication with the device
                 }
             }
+        }
+    }
+    fun display(msg : String){
+        GlobalScope.launch(Dispatchers.Main){
+            result_viewer.append(msg + "\n")
         }
     }
 
