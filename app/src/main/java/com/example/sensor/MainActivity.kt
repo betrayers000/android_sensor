@@ -17,6 +17,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import java.lang.Runnable
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -30,8 +31,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var manager : UsbManager
     lateinit var port : UsbSerialPort
     lateinit var buffer : ByteArray
-    val error = "len is zero"
-    var check = true
+    var loopChk = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,15 +51,13 @@ class MainActivity : AppCompatActivity() {
 
         }
         result_btn.setOnClickListener {
-            connect()
-            setstatus()
+            val thread = ThreadClass()
+            thread.start()
         }
 
         cancel_btn.setOnClickListener {
-
-            list_viewer.text  = "Ready"
+            loopChk = false
             result_viewer.text = "Ready"
-            result_viewer2.text = "Ready"
             port.close()
         }
 
@@ -71,16 +69,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setstatus(){
-        // O
-        var ppO2Val = arrayListOf<String>()
-        // T
-        var temperatureVal = arrayListOf<String>()
-        // P
-        var pressureVal = arrayListOf<String>()
-        // %
-        var O2Val = arrayListOf<String>()
-        // e
-        var statVal = arrayListOf<String>()
         var resultString = ""
         runBlocking {
             val job = launch(Dispatchers.Default) {
@@ -97,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                             val encode = String(byteArray, Charsets.UTF_8)
                             resultString += encode
                             if (encode.contains("\r\n")) {
-                                display("finish point ")
+//                                display("finish point ")
                                 check = false
                             }
                         }
@@ -105,15 +93,11 @@ class MainActivity : AppCompatActivity() {
                     job.join()
                     delay(10)
                     println("job end")
-//                    if (cnt > 200){
-//                        break
-//                    }
-//                    println(cnt.toString())
                 }
 
                 if (resultString != ""){
-                    display("full : " + resultString)
-                    display(resultString.split("").toString())
+//                    display("full : " + resultString)
+//                    display(resultString.split("").toString())
                 }
                 println("launch finish")
             }
@@ -121,9 +105,6 @@ class MainActivity : AppCompatActivity() {
             println("main thread ")
         }
         println("after blocking")
-//        list_viewer.text = "last String : " + resultString
-//        result_viewer.text = "complete String : " + ppO2Val + temperatureVal + pressureVal + O2Val + statVal
-//        result_viewer2.text = "stat value : " + statVal
     }
 
     fun findDevice(manager: UsbManager){
@@ -131,11 +112,6 @@ class MainActivity : AppCompatActivity() {
         if (driverList.isEmpty()){
             return
         }
-        val builder = StringBuilder()
-        driverList.forEach { driver ->
-            builder.append(driver.device.deviceName)
-        }
-        list_viewer.text = builder
         driver = driverList.get(0)
         connection = manager.openDevice(driver.device)
     }
@@ -162,6 +138,25 @@ class MainActivity : AppCompatActivity() {
         return port.read(buffer,1000)
     }
 
+    fun getSensorParmas(){
+        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
+        var cnt = 0
+        while(loopChk){
+            cnt += 1
+            println("port read")
+            var msg : String? = ""
+            msg = serialCommunication.SCRead()
+            if (msg != null){
+//                display(msg + cnt.toString())
+                val thread = ThreadClass()
+                thread.start()
+            }
+            if (cnt > 40){
+                loopChk = false
+            }
+        }
+    }
+
     private val usbReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
@@ -172,12 +167,9 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
-                            connect()
-                            for (i in 0..10){
+                            val thread = ThreadClass()
+                            thread.start()
 
-                                setstatus()
-                                display("now count : " + i.toString())
-                            }
                         }
                     } else {
                         Log.d("device", "permission denied for device $device")
@@ -193,10 +185,48 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    fun display(msg : String){
-        GlobalScope.launch(Dispatchers.Main){
-            result_viewer.append(msg + "\n")
+    inner class ThreadClass() : Thread(){
+        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
+
+        var msg : String? = ""
+        override fun run() {
+            var cnt = 0
+            while(loopChk){
+                cnt += 1
+                println("port read")
+                msg = serialCommunication.SCRead()
+//                if (cnt > 40){
+//                    loopChk = false
+//                }
+                if (msg != null) {
+                    val oxygen = getOxgen(msg)
+//                    val oxygen = msg!!.split("").toString()
+                    runOnUiThread {
+
+                        result_viewer.text = oxygen
+                    }
+                }
+            }
         }
+    }
+    fun getOxgen(msg : String?) : String{
+        var oxygen = ""
+        var arrChk = false
+        val msgArray = msg!!.split("")
+        for (i in 0 until msgArray.size-1){
+            if (msgArray[i] == "%"){
+                arrChk = true
+                continue
+            }
+            if (msgArray[i] == "e"){
+                arrChk = false
+                break
+            }
+            if (arrChk) {
+                oxygen += msgArray[i]
+            }
+        }
+        return oxygen + "%"
     }
 
 }
