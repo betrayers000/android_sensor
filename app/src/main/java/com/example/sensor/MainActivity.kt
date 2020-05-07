@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
@@ -25,6 +26,7 @@ import kotlin.collections.HashMap
 class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+    private val context = this
     lateinit var driverList : List<UsbSerialDriver>
     lateinit var driver :UsbSerialDriver
     lateinit var connection : UsbDeviceConnection
@@ -36,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
         result_viewer.movementMethod = ScrollingMovementMethod()
@@ -51,14 +52,11 @@ class MainActivity : AppCompatActivity() {
 
         }
         result_btn.setOnClickListener {
-            val thread = ThreadClass()
-            thread.start()
+            main_background.setBackgroundColor(ContextCompat.getColor(this, R.color.colorDanger))
         }
 
         cancel_btn.setOnClickListener {
-            loopChk = false
-            result_viewer.text = "Ready"
-            port.close()
+
         }
 
     }
@@ -200,10 +198,17 @@ class MainActivity : AppCompatActivity() {
 //                }
                 if (msg != null) {
                     val oxygen = getOxgen(msg)
+                    // 020.55 -> String
 //                    val oxygen = msg!!.split("").toString()
                     runOnUiThread {
 
                         result_viewer.text = oxygen
+                        // float change -> 20.55
+                        if (oxygen.toFloat() < 18){
+                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDanger))
+                        }else{
+                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                        }
                     }
                 }
             }
@@ -226,7 +231,7 @@ class MainActivity : AppCompatActivity() {
                 oxygen += msgArray[i]
             }
         }
-        return oxygen + "%"
+        return oxygen
     }
 
 }

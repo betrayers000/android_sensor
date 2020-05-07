@@ -51,41 +51,6 @@ class SerialCommunication(
         }
     }
 
-//    fun SCRead() : String{
-//
-//        var resultString = ""
-//        runBlocking {
-//            val job = launch(Dispatchers.Default) {
-//                println("launch in runblocking")
-//                var cnt = 0
-//                var check = true
-//                while (check) {
-//                    cnt += 1
-//                    val job = launch(Dispatchers.IO) {
-//                        println("job start")
-//                        val buffer = ByteArray(32)
-//                        val len = port.read(buffer, 1000)
-//                        if (len > 1) {
-//                            val byteArray = Arrays.copyOf(buffer, len)
-//                            val encode = String(byteArray, Charsets.UTF_8)
-//                            resultString += encode
-//                            if (encode.contains("\r\n")) {
-//                                check = false
-//                            }
-//                        }
-//                    }
-//                    job.join()
-//                    delay(10)
-//                    println("job end")
-//                }
-//                println("launch finish")
-//            }
-//            job.join()
-//            println("main thread ")
-//        }
-//        return resultString
-//
-//    }
 fun SCRead() : String?{
 
     var resultString = ""

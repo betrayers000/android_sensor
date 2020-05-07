@@ -4,18 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
+    android:background="@color/colorPrimaryDark"
+    tools:context=".MainActivity"
+    android:id="@+id/main_background">
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="산소농도"
+        android:textSize="50dp"
+        android:textColor="#fafafa"
+        android:gravity="center"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/result_viewer"/>
     <TextView
         android:text="ready"
+        android:background="@drawable/rounded_textview"
+        android:textColor="#fafafa"
+        android:textStyle="bold"
         android:gravity="center"
         android:id="@+id/result_viewer"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="380dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:textSize="30dp"
+        android:textSize="80dp"
         app:layout_constraintTop_toTopOf="parent" />
 
 
