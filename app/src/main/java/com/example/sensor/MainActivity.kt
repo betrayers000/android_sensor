@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var port : UsbSerialPort
     lateinit var buffer : ByteArray
     var loopChk = true
+    var tempoper = "+"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,99 +55,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun connect(){
-        findDevice(manager)
-        openDevice()
-    }
-
-    fun setstatus(){
-        var resultString = ""
-        runBlocking {
-            val job = launch(Dispatchers.Default) {
-                println("launch in runblocking")
-                var cnt = 0
-                var check = true
-                while (check) {
-                    cnt += 1
-                    val job = launch(Dispatchers.IO) {
-                        println("job start")
-                        val len = readPort()
-                        if (len > 1) {
-                            val byteArray = Arrays.copyOf(buffer, len)
-                            val encode = String(byteArray, Charsets.UTF_8)
-                            resultString += encode
-                            if (encode.contains("\r\n")) {
-//                                display("finish point ")
-                                check = false
-                            }
-                        }
-                    }
-                    job.join()
-                    delay(10)
-                    println("job end")
-                }
-
-                if (resultString != ""){
-//                    display("full : " + resultString)
-//                    display(resultString.split("").toString())
-                }
-                println("launch finish")
-            }
-            job.join()
-            println("main thread ")
-        }
-        println("after blocking")
-    }
-
-    fun findDevice(manager: UsbManager){
-        driverList = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
-        if (driverList.isEmpty()){
-            return
-        }
-        driver = driverList.get(0)
-        connection = manager.openDevice(driver.device)
-    }
-
-
-    fun openDevice(){
-        if (driverList.isEmpty()){
-            return
-        }
-        try {
-            port = driver.ports.get(0)
-            port.open(connection)
-            port.setParameters(9600, 8, 1, 0)
-        }catch (e : Exception){
-            result_viewer.text = e.toString()
-        }
-    }
-
-    fun readPort() : Int{
-        buffer = ByteArray(32)
-        if (driverList.isEmpty()){
-            return 0
-        }
-        return port.read(buffer,1000)
-    }
-
-    fun getSensorParmas(){
-        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
-        var cnt = 0
-        while(loopChk){
-            cnt += 1
-            println("port read")
-            var msg : String? = ""
-            msg = serialCommunication.SCRead()
-            if (msg != null){
-//                display(msg + cnt.toString())
-                val thread = ThreadClass()
-                thread.start()
-            }
-            if (cnt > 40){
-                loopChk = false
-            }
-        }
-    }
 
     private val usbReceiver = object : BroadcastReceiver() {
 
@@ -190,18 +98,19 @@ class MainActivity : AppCompatActivity() {
 //                    loopChk = false
 //                }
                 if (msg != null) {
-                    val oxygen = getOxgen(msg)
+                    val hashMap = getOxgen(msg)
+                    val oxygen = hashMap.get("%")!!.toFloat()
                     // 020.55 -> String
 //                    val oxygen = msg!!.split("").toString()
 
                     // 온도
-                    val temp = 21
+                    val temp = hashMap.get("T")
                     runOnUiThread {
 
                         // 산소농도 값 넣기
-                        result_viewer.text = oxygen
+                        result_viewer.text = oxygen.toString()
                         // 산소농도에 따라 배경화면 색이 변함
-                        if (oxygen.toFloat() < 18){
+                        if (oxygen < 18){
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDanger))
                         }else{
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
@@ -214,24 +123,62 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    fun getOxgen(msg : String?) : String{
-        var oxygen = ""
+    fun getOxgen(msg : String?) : MutableMap<String, String>{
+        val checkList = listOf<String>("O", "P", "e", "%", "T")
+        var checkString = "O"
+        val hashMap = mutableMapOf<String, String>("O" to "")
+        val msgArray = msg!!.split("")
+        for (i in 0 until msgArray.size-1) {
+            val n = msgArray[i]
+            if (n == " "){
+                continue
+            }
+//            if (n == "+"){
+//                continue
+//            } else if (n == "-"){
+//                tempoper = "-"
+//                continue
+//            }
+            if (n in checkList){
+                checkString = n
+                hashMap.put(n, "")
+            }
+            val temp = hashMap.get(checkString)
+            hashMap.put(checkString, temp + n)
+        }
+        return hashMap
+    }
+
+    fun getTemp(msg : String?) : String{
+        var temp = ""
         var arrChk = false
+        var oper = true // true : + , false : -
         val msgArray = msg!!.split("")
         for (i in 0 until msgArray.size-1){
-            if (msgArray[i] == "%"){
+            if (msgArray[i] == "T"){
                 arrChk = true
                 continue
             }
-            if (msgArray[i] == "e"){
+            if (msgArray[i] == "P"){
                 arrChk = false
                 break
             }
             if (arrChk) {
-                oxygen += msgArray[i]
+                if (msgArray[i] == "-" || msgArray[i] == "+"){
+                    if (msgArray[i] == "-"){
+                        oper = false
+                    }
+                } else if (msgArray[i] != " ") {
+                    temp += msgArray[i]
+                }
             }
         }
-        return oxygen
+        if (oper) {
+            temp = "+" + temp.toFloat().toString()
+        } else {
+            temp = "-" + temp.toFloat().toString()
+        }
+        return temp
     }
 
     // 액션바에 설정버튼 추가
