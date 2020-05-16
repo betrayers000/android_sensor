@@ -15,14 +15,14 @@
         <TableRow>
 
             <TextView
-                android:background="@color/colorGrey"
+                android:background="@color/grey"
                 android:layout_width="0dp"
                 android:layout_weight="2.5"
                 android:layout_height="wrap_content"
                 android:text="산소농도(%)"
                 android:gravity="center" />
             <TextView
-                android:background="@color/colorGrey"
+                android:background="@color/grey"
                 android:layout_width="0dp"
                 android:layout_weight="7.5"
                 android:layout_height="wrap_content"
@@ -150,7 +150,7 @@
                 android:layout_weight="2.5"
                 android:layout_height="wrap_content"
                 android:text="18.0"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 android:gravity="center"
                 />
             <TextView
@@ -158,7 +158,7 @@
                 android:layout_weight="7.5"
                 android:layout_height="wrap_content"
                 android:text="노동안전위생 기준 최저치(공장, 다중이용시설)"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 />
         </TableRow>
         <TableRow
@@ -168,7 +168,7 @@
                 android:layout_weight="2.5"
                 android:layout_height="wrap_content"
                 android:text="15-16"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 android:gravity="center"
                 />
             <TextView
@@ -176,7 +176,7 @@
                 android:layout_weight="7.5"
                 android:layout_height="wrap_content"
                 android:text="현기증 증상, 호흡수 증가"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 />
         </TableRow>
         <TableRow
@@ -186,7 +186,7 @@
                 android:layout_weight="2.5"
                 android:layout_height="wrap_content"
                 android:text="13-15"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 android:gravity="center"
                 />
             <TextView
@@ -194,7 +194,7 @@
                 android:layout_weight="7.5"
                 android:layout_height="wrap_content"
                 android:text="두통, 창백한 얼굴, 구토증세"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 />
         </TableRow>
         <TableRow
@@ -204,7 +204,7 @@
                 android:layout_weight="2.5"
                 android:layout_height="wrap_content"
                 android:text="12.0"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 android:gravity="center"
                 />
             <TextView
@@ -212,7 +212,7 @@
                 android:layout_weight="7.5"
                 android:layout_height="wrap_content"
                 android:text="단시간 위험"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 />
         </TableRow>
         <TableRow
@@ -222,7 +222,7 @@
                 android:layout_weight="2.5"
                 android:layout_height="wrap_content"
                 android:text="7.0"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 android:gravity="center"
                 />
             <TextView
@@ -230,7 +230,7 @@
                 android:layout_weight="7.5"
                 android:layout_height="wrap_content"
                 android:text="사망"
-                android:textColor="@color/colorDanger"
+                android:textColor="@color/red"
                 />
         </TableRow>
 
