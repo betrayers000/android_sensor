@@ -111,9 +111,9 @@ class MainActivity : AppCompatActivity() {
                         result_viewer.text = oxygen.toString() + " %"
                         // 산소농도에 따라 배경화면 색이 변함
                         if (oxygen < 18){
-                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDanger))
+                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
                         }else{
-                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
                         }
 
                         // 온도 값 넣기
