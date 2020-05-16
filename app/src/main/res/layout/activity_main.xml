@@ -7,30 +7,30 @@
     android:background="@color/colorPrimaryDark"
     tools:context=".MainActivity"
     android:id="@+id/main_background">
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="10"
-        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:id="@+id/title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            app:layout_constraintWidth_percent="0.6"
+            app:layout_constraintHeight_percent="0.1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:text="산소농도"
-            android:textSize="50dp"
+            android:autoSizeTextType="uniform"
             android:textColor="#fafafa"
             android:gravity="center"
             android:textStyle="bold"/>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintVertical_bias="0.1"
             android:background="@drawable/rounded_textview"
-            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
-            android:weightSum="10">
+            app:layout_constraintHeight_percent="0.5">
 
             <TextView
                 android:text="ready"
@@ -40,27 +40,25 @@
                 android:id="@+id/result_viewer"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="6"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:autoSizeTextType="uniform"
+                app:layout_constraintHeight_percent="0.4"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:textSize="80dp"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
                 android:id="@+id/result_viewer_tmp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2"
-                app:layout_constraintBottom_toBottomOf="@+id/result_viewer"
+                app:layout_constraintHeight_percent="0.13"
+                app:layout_constraintTop_toBottomOf="@+id/result_viewer"
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:text="tmp"
-                android:textSize="40dp"
+                android:autoSizeTextType="uniform"
                 android:gravity="center"
                 android:textColor="#fafafa"/>
-        </LinearLayout>
-
-    </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
