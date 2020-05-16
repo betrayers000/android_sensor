@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
             val filter = IntentFilter(ACTION_USB_PERMISSION)
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
-
         }
     }
 
@@ -99,17 +98,17 @@ class MainActivity : AppCompatActivity() {
 //                    loopChk = false
 //                }
                 if (msg != null) {
-                    val hashMap = getOxgen(msg)
+                    val hashMap = getMap(msg)
                     val oxygen = hashMap.get("%")!!.toFloat()
                     // 020.55 -> String
 //                    val oxygen = msg!!.split("").toString()
 
                     // 온도
-                    val temp = hashMap.get("T")
+                    val temp = hashMap.get("T") + " °C"
                     runOnUiThread {
 
                         // 산소농도 값 넣기
-                        result_viewer.text = oxygen.toString()
+                        result_viewer.text = oxygen.toString() + " %"
                         // 산소농도에 따라 배경화면 색이 변함
                         if (oxygen < 18){
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDanger))
@@ -124,7 +123,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    fun getOxgen(msg : String?) : MutableMap<String, String>{
+    fun getMap(msg : String?) : MutableMap<String, String>{
         val checkList = listOf<String>("O", "P", "e", "%", "T")
         var checkString = "O"
         val hashMap = mutableMapOf<String, String>("O" to "")
@@ -143,6 +142,7 @@ class MainActivity : AppCompatActivity() {
             if (n in checkList){
                 checkString = n
                 hashMap.put(n, "")
+                continue
             }
             val temp = hashMap.get(checkString)
             hashMap.put(checkString, temp + n)
@@ -150,37 +150,6 @@ class MainActivity : AppCompatActivity() {
         return hashMap
     }
 
-    fun getTemp(msg : String?) : String{
-        var temp = ""
-        var arrChk = false
-        var oper = true // true : + , false : -
-        val msgArray = msg!!.split("")
-        for (i in 0 until msgArray.size-1){
-            if (msgArray[i] == "T"){
-                arrChk = true
-                continue
-            }
-            if (msgArray[i] == "P"){
-                arrChk = false
-                break
-            }
-            if (arrChk) {
-                if (msgArray[i] == "-" || msgArray[i] == "+"){
-                    if (msgArray[i] == "-"){
-                        oper = false
-                    }
-                } else if (msgArray[i] != " ") {
-                    temp += msgArray[i]
-                }
-            }
-        }
-        if (oper) {
-            temp = "+" + temp.toFloat().toString()
-        } else {
-            temp = "-" + temp.toFloat().toString()
-        }
-        return temp
-    }
 
     // 액션바에 설정버튼 추가
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
