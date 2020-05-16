@@ -11,6 +11,7 @@ import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialDriver
@@ -192,15 +193,22 @@ class MainActivity : AppCompatActivity() {
                     val oxygen = getOxgen(msg)
                     // 020.55 -> String
 //                    val oxygen = msg!!.split("").toString()
+
+                    // 온도
+                    val temp = 21
                     runOnUiThread {
 
+                        // 산소농도 값 넣기
                         result_viewer.text = oxygen
-                        // float change -> 20.55
+                        // 산소농도에 따라 배경화면 색이 변함
                         if (oxygen.toFloat() < 18){
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDanger))
                         }else{
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
                         }
+
+                        // 온도 값 넣기
+                        result_viewer_tmp.text = temp.toString()
                     }
                 }
             }
@@ -225,5 +233,12 @@ class MainActivity : AppCompatActivity() {
         }
         return oxygen
     }
+
+    // 액션바에 설정버튼 추가
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
 
 }
