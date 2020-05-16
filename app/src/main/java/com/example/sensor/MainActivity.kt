@@ -11,6 +11,7 @@ import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialDriver
@@ -232,5 +233,12 @@ class MainActivity : AppCompatActivity() {
         }
         return oxygen
     }
+
+    // 액션바에 설정버튼 추가
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
 
 }
