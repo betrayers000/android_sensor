@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="density">
+        <item>20.0</item>
+        <item>19.5</item>
+        <item>19.0</item>
+        <item>18.5</item>
+        <item>18.0</item>
+        <item>17.5</item>
+        <item>17.0</item>
+        <item>16.5</item>
+        <item>16.0</item>
+        <item>15.5</item>
+        <item>15.0</item>
+        <item>14.5</item>
+        <item>14.0</item>
+        <item>13.5</item>
+        <item>13.0</item>
+    </string-array>
+    <string-array name="sound_lists">
+        <item>싸이렌</item>
+        <item>시끄러운소리</item>
+        <item>경고음</item>
+    </string-array>
+</resources>

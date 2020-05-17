@@ -1,38 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="10"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6"
-            android:weightSum="10"
-            android:orientation="vertical">
             <TextView
                 android:id="@+id/title"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintWidth_percent="0.8"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 android:gravity="center"
                 android:text="산소 농도에 따른 인체영향"
                 android:textSize="20dp"
                 android:textStyle="bold"
+                android:autoSizeTextType="uniform"
                 android:layout_marginTop="10dp"/>
+
             <LinearLayout
+                android:id="@+id/table"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="8">
+                app:layout_constraintHeight_percent="0.45">
                 <include
                     layout="@layout/include_table"/>
             </LinearLayout>
+            <LinearLayout
+                app:layout_constraintVertical_bias="0.1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.4"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/table"
+                app:layout_constraintBottom_toBottomOf="parent">
+                <include
+                    layout="@layout/include_options"/>
+            </LinearLayout>
 
-
-        </LinearLayout>
-
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
