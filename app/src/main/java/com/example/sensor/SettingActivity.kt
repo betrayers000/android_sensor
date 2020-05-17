@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CompoundButton
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sensor.App.Companion.prefs
@@ -59,9 +60,15 @@ class SettingActivity: AppCompatActivity() {
         // 기존에 설정한 값으로 불러오기
         sound_spinner.setSelection(items2.indexOf(prefs.sound))
 
-        // 스위치 상태를 기존에 설정한 값으로 불러오기
+        // 급격한 변화스위치 상태를 기존에 설정한 값으로 불러오기
+        val data = prefs.change_switch
+        change_switch.isChecked = data
 
+        // 특정 농도 알림스위치 상태를 기존에 설정한 값으로
+        val data2 = prefs.stay_switch
+        stay_switch.isChecked = data2
     }
+
 
     // 앱바에 확인버튼 추가
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
