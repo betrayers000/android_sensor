@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     val sound = App.prefs.sound
     val change = App.prefs.change_switch
     val stay = App.prefs.stay_switch
+    var reVal : Float? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -54,9 +55,7 @@ class MainActivity : AppCompatActivity() {
             manager.requestPermission(d, permissionIntent)
         }
         ring_off_btn.setOnClickListener {
-            App.ringtone.run {
-                if(isPlaying) stop()
-            }
+            ringOff()
         }
     }
 
@@ -84,9 +83,7 @@ class MainActivity : AppCompatActivity() {
             if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
                 val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
                 device?.apply {
-                    App.ringtone.run {
-                        if (isPlaying()) stop()
-                    }
+                    ringOff()
                     // call your method that cleans up and closes communication with the device
                 }
             }
@@ -120,12 +117,13 @@ class MainActivity : AppCompatActivity() {
                         // 산소농도에 따라 배경화면 색이 변함
                         if (oxygen < danger){
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
-                            App.ringtone.run {
-                                if(!isPlaying) play()
-                            }
-                        }else{
+                            ringOn()
+                        } else if (reVal != null && reVal!! - oxygen > 0.1){
+                            ringOn()
+                        } else{
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
                         }
+                        reVal = oxygen
 
                         // 온도 값 넣기
                         result_viewer_tmp.text = temp.toString()
@@ -175,6 +173,17 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 return super.onOptionsItemSelected(item)
             }
+        }
+    }
+
+    fun ringOn(){
+        App.ringtone.run {
+            if(!isPlaying) play()
+        }
+    }
+    fun ringOff(){
+        App.ringtone.run {
+            if(isPlaying) stop()
         }
     }
 
