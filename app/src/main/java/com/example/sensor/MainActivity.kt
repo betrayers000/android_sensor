@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -29,16 +30,15 @@ class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     private val context = this
-    lateinit var driverList : List<UsbSerialDriver>
-    lateinit var driver :UsbSerialDriver
-    lateinit var connection : UsbDeviceConnection
     lateinit var manager : UsbManager
-    lateinit var port : UsbSerialPort
-    lateinit var buffer : ByteArray
     var loopChk = true
-    var tempoper = "+"
+    val danger = App.prefs.danger
+    val sound = App.prefs.sound
+    val change = App.prefs.change_switch
+    val stay = App.prefs.stay_switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
@@ -52,6 +52,11 @@ class MainActivity : AppCompatActivity() {
             val filter = IntentFilter(ACTION_USB_PERMISSION)
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
+        }
+        ring_off_btn.setOnClickListener {
+            App.ringtone.run {
+                if(isPlaying) stop()
+            }
         }
     }
 
@@ -79,6 +84,9 @@ class MainActivity : AppCompatActivity() {
             if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
                 val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
                 device?.apply {
+                    App.ringtone.run {
+                        if (isPlaying()) stop()
+                    }
                     // call your method that cleans up and closes communication with the device
                 }
             }
@@ -110,8 +118,11 @@ class MainActivity : AppCompatActivity() {
                         // 산소농도 값 넣기
                         result_viewer.text = oxygen.toString() + " %"
                         // 산소농도에 따라 배경화면 색이 변함
-                        if (oxygen < 18){
+                        if (oxygen < danger){
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
+                            App.ringtone.run {
+                                if(!isPlaying) play()
+                            }
                         }else{
                             main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
                         }
@@ -133,12 +144,6 @@ class MainActivity : AppCompatActivity() {
             if (n == " "){
                 continue
             }
-//            if (n == "+"){
-//                continue
-//            } else if (n == "-"){
-//                tempoper = "-"
-//                continue
-//            }
             if (n in checkList){
                 checkString = n
                 hashMap.put(n, "")
