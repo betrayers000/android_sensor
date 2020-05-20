@@ -60,7 +60,7 @@
                 app:layout_constraintHeight_percent="0.13"
                 app:layout_constraintTop_toBottomOf="@+id/result_viewer"
                 app:layout_constraintLeft_toLeftOf="parent"
-                android:text="tmp"
+                android:text="temp"
                 android:autoSizeTextType="uniform"
                 android:textSize="20dp"
                 android:gravity="center"
