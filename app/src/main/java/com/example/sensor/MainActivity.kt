@@ -45,6 +45,11 @@ class MainActivity : AppCompatActivity() {
 
         result_viewer.movementMethod = ScrollingMovementMethod()
 
+        //임시로 클릭버튼 생성
+        connecting_btn.setOnClickListener {
+            startActivity(Intent(this, ConnectingActivity::class.java))
+        }
+
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
         deviceList.values.forEach { d ->
             val permissionIntent =
@@ -172,5 +177,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
 }
