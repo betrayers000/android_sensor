@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/setting_title_sound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="기본설정"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/setting_sound"
+        app:layout_constraintVertical_bias="0.3"
+        android:textSize="23sp"
+        android:layout_marginStart="15dp"
+        android:textStyle="bold"/>
+    <LinearLayout
+        android:id="@+id/setting_sound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/setting_title_sound"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/setting_title_sensor"
+        android:background="@color/grey"
+        android:weightSum="1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="알림소리설정"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="15dp"
+            android:layout_weight="0.5"/>
+        <Spinner
+            android:id="@+id/sound_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/setting_title_sensor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="측정센서선택"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_sound"
+        app:layout_constraintBottom_toBottomOf="@id/setting_sensor"
+        android:textSize="23sp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"/>
+    <LinearLayout
+        android:id="@+id/setting_sensor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/setting_title_sensor"
+        android:orientation="horizontal"
+        app:layout_constraintVertical_bias="0.1"
+        android:background="@color/grey"
+        android:weightSum="1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="센서종류"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="15dp"
+            android:layout_weight="0.5"/>
+        <Spinner
+            android:id="@+id/sensor_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/setting_title_sensor_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="센서 설정"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_sensor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="23sp"
+        android:layout_marginStart="15dp"
+        app:layout_constraintVertical_bias="0.1"
+        android:textStyle="bold"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
