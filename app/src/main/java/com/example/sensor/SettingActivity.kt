@@ -76,10 +76,11 @@ class SettingActivity: AppCompatActivity() {
         // 기존에 설정한 값으로 불러오기
         sensor_spinner.setSelection(items3.indexOf(prefs.sensor))
 
+        // 디테일페이지시험
+        sensor_btn_detail.setOnClickListener {
+            startActivity(Intent(this, SensorDetailActivity::class.java))
+        }
 
-
-
-        // 스위치 상태를 기존에 설정한 값으로 불러오기
 
     }
 
@@ -111,6 +112,7 @@ class SettingActivity: AppCompatActivity() {
             }
         }
     }
+
 
 
 

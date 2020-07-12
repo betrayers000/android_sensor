@@ -31,13 +31,36 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintVertical_bias="0.05"/>
+        <Button
+            android:id="@+id/main_measure_btn"
+            android:text="측정하기"
+            android:layout_width="0dp"
+            app:layout_constraintWidth_percent="0.6"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintVertical_bias="0.83"/>
+        <Button
+            android:id="@+id/main_sound_off_btn"
+            android:text="알림끄기"
+            android:layout_width="0dp"
+            app:layout_constraintWidth_percent="0.6"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintVertical_bias="0.9"/>
 
+
+
         <androidx.constraintlayout.widget.ConstraintLayout
             app:layout_constraintVertical_bias="0.1"
-            android:background="@drawable/rounded_textview"
+            android:background="@drawable/rectangled_textview"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -56,9 +79,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:autoSizeTextType="uniform"
-                android:textSize="50dp"
+                android:textSize="80dp"
                 app:layout_constraintHeight_percent="0.4"
-                app:layout_constraintVertical_bias="0.42"
+                app:layout_constraintVertical_bias="0.2"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -68,12 +91,34 @@
                 android:id="@+id/result_viewer_tmp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintHeight_percent="0.13"
+                app:layout_constraintHeight_percent="0.2"
                 app:layout_constraintTop_toBottomOf="@+id/result_viewer"
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:text="tmp"
                 android:autoSizeTextType="uniform"
                 android:textSize="20dp"
+                android:gravity="center"
+                android:textColor="#fafafa"/>
+            <TextView
+                android:id="@+id/result_viewer_min"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.13"
+                app:layout_constraintTop_toBottomOf="@+id/result_viewer_tmp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:text="min : 18%"
+                android:autoSizeTextType="uniform"
+                android:gravity="center"
+                android:textColor="#fafafa"/>
+            <TextView
+                android:id="@+id/result_viewer_max"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.13"
+                app:layout_constraintTop_toBottomOf="@+id/result_viewer_min"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:text="max : 18%"
+                android:autoSizeTextType="uniform"
                 android:gravity="center"
                 android:textColor="#fafafa"/>
 

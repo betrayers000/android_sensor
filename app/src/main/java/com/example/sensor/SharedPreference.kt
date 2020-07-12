@@ -14,6 +14,8 @@ class SharedPreference(context: Context) {
     val prefs_key_change_switch = "change_switch"
     val prefs_key_stay_switch = "stay_switch"
     val prefs_key_sensor = "sensor"
+    val prefs_key_min_switch = "min_switch"
+    val prefs_key_max_switch = "max_switch"
 
     // method
     var danger: Float
@@ -35,4 +37,14 @@ class SharedPreference(context: Context) {
     var sensor: String
         get() = prefs.getString(prefs_key_sensor, "산소")!!
         set(value) = prefs.edit().putString(prefs_key_sensor, value).apply()
+
+    var min_switch: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch, value).apply()
+
+    var max_switch: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch, value).apply()
+
+
 }
