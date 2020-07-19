@@ -19,16 +19,20 @@ import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
+import com.hoho.android.usbserial.util.SerialInputOutputManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+    private val READY = "NEED CONNECT"
+    private val CONNECT = "CONNECT"
     private val context = this
     lateinit var manager : UsbManager
     var loopChk = true
@@ -42,6 +46,9 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        result_viewer.text = READY
+        main_title.text = App.prefs.sensor
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
         result_viewer.movementMethod = ScrollingMovementMethod()
@@ -59,8 +66,10 @@ class MainActivity : AppCompatActivity() {
             registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
         }
-        ring_off_btn.setOnClickListener {
-            ringOff()
+
+        main_measure_btn.setOnClickListener {
+            val thread = ThreadClass()
+            thread.start()
         }
     }
 
@@ -68,6 +77,7 @@ class MainActivity : AppCompatActivity() {
     private val usbReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
+            // 연결됐을 때
             if (ACTION_USB_PERMISSION == intent.action) {
                 synchronized(this) {
                     val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
@@ -75,68 +85,117 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             //call method to set up device communication
-                            val thread = ThreadClass()
-                            thread.start()
+//                            val thread = ThreadClass()
+//                            thread.start()
+                            // 연결 되면 연결 성공 이미지를 넣는다거나 문구를 변경시킨다.
+                            result_viewer.text = CONNECT
 
                         }
                     } else {
+                        // 권한 허용이 안되어있는 경우
                         Log.d("device", "permission denied for device $device")
+                        result_viewer.text = READY
                     }
 
                 }
             }
+            // 연결이 끊겼을때
             if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
                 val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
                 device?.apply {
                     ringOff()
                     // call your method that cleans up and closes communication with the device
+                    result_viewer.text = READY
                 }
             }
         }
     }
     inner class ThreadClass() : Thread(){
-        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
 
-        var msg : String? = ""
         override fun run() {
-            var cnt = 0
-            while(loopChk){
-                cnt += 1
-                println("port read")
-                msg = serialCommunication.SCRead()
-//                if (cnt > 40){
-//                    loopChk = false
-//                }
-                if (msg != null) {
-                    val hashMap = getMap(msg)
-                    val oxygen = hashMap.get("%")!!.toFloat()
-                    // 020.55 -> String
-//                    val oxygen = msg!!.split("").toString()
+            when(App.prefs.sensor){
+                resources.getStringArray(R.array.sensor_lists)[0] -> {
+                    o2Sensor()
+                }
+                resources.getStringArray(R.array.sensor_lists)[1] -> {
+                    co2Sensor()
+                }
+                resources.getStringArray(R.array.sensor_lists)[2] -> {
+                    tbSensor()
+                }
+            }
 
-                    // 온도
-                    val temp = hashMap.get("T") + " °C"
-                    runOnUiThread {
+        }
+    }
 
-                        // 산소농도 값 넣기
-                        result_viewer.text = oxygen.toString() + " %"
-                        // 산소농도에 따라 배경화면 색이 변함
-                        if (oxygen < danger){
-                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
-                            ringOn()
-                        } else if (reVal != null && reVal!! - oxygen > 0.1){
-                            ringOn()
-                        } else{
-                            main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
-                        }
-                        reVal = oxygen
 
-                        // 온도 값 넣기
-                        result_viewer_tmp.text = temp.toString()
-                    }
+    /**
+     * 이산환탄소 센서 측정
+     */
+    fun co2Sensor(){
+        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
+        var msg : String? = ""
+        while(loopChk){
+            msg = serialCommunication.SCRead() // Z xxxxx
+
+            if (msg != null) {
+                val sensorVal = msg.split(" ")[2]
+                runOnUiThread {
+                    // 산소농도 값 넣기
+                    result_viewer.text = sensorVal
                 }
             }
         }
     }
+
+    /**
+     * 산소 센서 측정
+     */
+    fun o2Sensor(){
+        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
+        var msg : String? = ""
+        var cnt = 0
+        while(loopChk){
+            cnt += 1
+            println("port read")
+            msg = serialCommunication.SCRead()
+//                if (cnt > 40){
+//                    loopChk = false
+//                }
+            if (msg != null) {
+                val hashMap = getMap(msg)
+                val oxygen = hashMap.get("%")!!.toFloat()
+                // 020.55 -> String
+//                    val oxygen = msg!!.split("").toString()
+
+                // 온도
+                val temp = hashMap.get("T") + " °C"
+                runOnUiThread {
+
+                    // 산소농도 값 넣기
+                    result_viewer.text = oxygen.toString() + " %"
+                    // 산소농도에 따라 배경화면 색이 변함
+                    if (oxygen < danger){
+                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
+                        ringOn()
+                    } else if (reVal != null && reVal!! - oxygen > 0.1){
+                        ringOn()
+                    } else{
+                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
+                    }
+                    reVal = oxygen
+
+                    // 온도 값 넣기
+                    result_viewer_tmp.text = temp.toString()
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 산소측정 센서 각 수치별로 나눠주는 함수
+     */
     fun getMap(msg : String?) : MutableMap<String, String>{
         val checkList = listOf<String>("O", "P", "e", "%", "T")
         var checkString = "O"
@@ -158,6 +217,42 @@ class MainActivity : AppCompatActivity() {
         return hashMap
     }
 
+    /**
+     * TB 센서 함수
+     */
+    fun tbSensor(){
+        val command = byteArrayOfInt(0xFF, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x78)
+        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
+        val result = serialCommunication.write(command)
+        runOnUiThread {
+            // 산소농도 값 넣기
+            result_viewer.text = result
+        }
+//        val port = serialCommunication.port
+//        val mListener: SerialInputOutputManager.Listener =
+//            object : SerialInputOutputManager.Listener {
+//                override fun onRunError(e: java.lang.Exception) {
+//                    Log.d("tbSensor", "Runner stopped.")
+//                }
+//
+//                override fun onNewData(data: ByteArray) {
+//                    runOnUiThread {
+//                        // 산소농도 값 넣기
+//                        result_viewer.text = data.toString()
+//                    }
+//
+//                }
+//            }
+//
+//        val serialInputOutputManager = SerialInputOutputManager(port, mListener)
+//        Executors.newSingleThreadExecutor().submit(serialInputOutputManager)
+//        port.write(command, 1000)
+    }
+
+    /**
+     * Create ByteArray
+     */
+    fun byteArrayOfInt(vararg ints : Int) = ByteArray(ints.size) {pos -> ints[pos].toByte()}
 
     // 액션바에 설정버튼 추가
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -83,10 +83,6 @@ class SettingActivity: AppCompatActivity() {
         sensor_btn_detail.setOnClickListener {
             startActivity(Intent(this, SensorDetailActivity::class.java))
         }
-
-        // 급격한 변화스위치 상태를 기존에 설정한 값으로 불러오기
-        val data = prefs.change_switch
-        change_switch.isChecked = data
     }
 
 
@@ -103,12 +99,14 @@ class SettingActivity: AppCompatActivity() {
                 val confirmIntent = Intent(this, MainActivity::class.java)
 
                 // 액티비티가 전환되기전 sharedPreference에 값저장하기
-                val danger_data = danger_spinner.selectedItem.toString()
-                prefs.danger = danger_data.toFloat()
+//                val danger_data = danger_spinner.selectedItem.toString()
+//                prefs.danger = danger_data.toFloat()
                 prefs.sound = sound_spinner.selectedItem.toString()
-                prefs.change_switch = change_switch.isChecked
+                prefs.sensor = sensor_spinner.selectedItem.toString()
+//                prefs.change_switch = change_switch.isChecked
 
                 startActivity(confirmIntent)
+                finish()
                 return true
             }
             else -> {

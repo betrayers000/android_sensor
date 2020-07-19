@@ -1,13 +1,19 @@
 package com.example.sensor
 
+import android.content.Context
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.util.Log
 import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
-import kotlinx.coroutines.*
-import java.util.*
+import com.hoho.android.usbserial.util.SerialInputOutputManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.nio.charset.Charset
+import java.util.concurrent.Executors
 
 class SerialCommunication(
     val manager: UsbManager,
@@ -15,7 +21,8 @@ class SerialCommunication(
     val baudRate: Int,
     val dataBits : Int,
     val stopBits: Int,
-    val parity: Int) {
+    val parity: Int
+) {
     // manager : UsbManager, index : driverList 에서 선택할 driver 번호
 
     private val SC_TAG = "Serial Communication"
@@ -51,48 +58,83 @@ class SerialCommunication(
         }
     }
 
-fun SCRead() : String?{
+    fun SCRead() : String?{
+        Log.d(SC_TAG, "READ START")
 
-    var resultString = ""
-    runBlocking {
-            var cnt = 0
-            var check = true
-            while (check) {
-                cnt += 1
-                val job = launch(Dispatchers.IO) {
-                    println("job start")
-                    val buffer = ByteArray(64)
-                    try {
-                        val len = port.read(buffer, 1000)
+        var resultString = ""
+        runBlocking {
+                var cnt = 0
+                var check = true
+                while (check) {
+                    cnt += 1
+                    val job = launch(Dispatchers.IO) {
+                        val buffer = ByteArray(64)
+                        try {
+                            val len = port.read(buffer, 1000)
 
-                        if (len > 1) {
-                            val byteArray = buffer.copyOf(len)
-                            val encode = String(byteArray, Charsets.UTF_8)
-                            resultString += encode
-                            if (encode.contains("\r\n")) {
+                            if (len > 1) {
+                                val byteArray = buffer.copyOf(len)
+                                val encode = String(byteArray, Charsets.UTF_8)
+                                resultString += encode
+                                if (encode.contains("\r\n")) {
+                                    check = false
+                                }
+                            }
+                        } catch (e: Exception){
+
+                        }
+                    }
+                    job.join()
+                    delay(300)
+                }
+            }
+        if (resultString.equals("sensor : ")){
+            return null
+        }
+        return resultString
+
+    }
+
+
+    fun write(command : ByteArray) : String?{
+        Log.d(SC_TAG, "Write & Read START")
+        var resultString = ""
+        runBlocking {
+            Log.d(SC_TAG, "Write & Read START job")
+            val job = launch(Dispatchers.IO) {
+                port.write(command, 1000)
+                var cnt = 0
+                var check = true
+                while (check) {
+                    cnt += 1
+                    val job = launch(Dispatchers.IO) {
+                        val buffer = ByteArray(64)
+                        try {
+                            val len = port.read(buffer, 1000)
+
+                            if (len > 1) {
+                                val byteArray = buffer.copyOf(len)
+//                                val encode = String(byteArray, Charsets.US_ASCII)
+//                                resultString += encode
+                                val num = Integer.parseInt(byteArray[2].toString(), 16)
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[2].toString() )
+                                resultString += num
+                                resultString += (byteArray[2] * 256 + byteArray[2]).toString()
+                                Log.d(SC_TAG, "Write & Read START job result : " + resultString )
                                 check = false
                             }
+                        } catch (e: Exception){
+                            Log.d(SC_TAG, "Write & Read START error")
                         }
-                    } catch (e: Exception){
-
                     }
+                    job.join()
+                    delay(300)
                 }
-//                if (cnt > 5){
-//                    check= false
-//                    resultString += cnt.toString()
-//                }
-                job.join()
-                delay(10)
-                println("job end")
             }
-            println("launch finish")
+            job.join()
+            delay(300)
         }
-    if (resultString.equals("sensor : ")){
-        return null
+        return resultString
     }
-    println("blocking end")
-    return resultString
-
-}
 
 }
