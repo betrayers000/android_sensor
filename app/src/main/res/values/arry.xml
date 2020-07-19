@@ -22,4 +22,9 @@
         <item>시끄러운소리</item>
         <item>경고음</item>
     </string-array>
+    <string-array name="sensor_lists">
+        <item>산소</item>
+        <item>이산화탄소</item>
+        <item>일산화탄소</item>
+    </string-array>
 </resources>
