@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CompoundButton
+import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sensor.App.Companion.prefs
 import kotlinx.android.synthetic.main.activity_setting2.*
@@ -58,6 +60,7 @@ class SettingActivity: AppCompatActivity() {
         // 기존에 설정한 값으로 불러오기
         sound_spinner.setSelection(items2.indexOf(prefs.sound))
 
+
         // 센서종류 스피너 사용
         val items3 = resources.getStringArray(R.array.sensor_lists)
         val sensorAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items3)
@@ -81,8 +84,11 @@ class SettingActivity: AppCompatActivity() {
             startActivity(Intent(this, SensorDetailActivity::class.java))
         }
 
-
+        // 급격한 변화스위치 상태를 기존에 설정한 값으로 불러오기
+        val data = prefs.change_switch
+        change_switch.isChecked = data
     }
+
 
     // 앱바에 확인버튼 추가
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -101,8 +107,6 @@ class SettingActivity: AppCompatActivity() {
                 prefs.danger = danger_data.toFloat()
                 prefs.sound = sound_spinner.selectedItem.toString()
                 prefs.change_switch = change_switch.isChecked
-                prefs.stay_switch = stay_switch.isChecked
-
 
                 startActivity(confirmIntent)
                 return true
