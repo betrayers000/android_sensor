@@ -5,15 +5,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.ColorDrawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.media.RingtoneManager
 import android.os.Bundle
+import android.os.IBinder
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialDriver
@@ -31,8 +34,6 @@ import kotlin.collections.HashMap
 class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
-    private val READY = "NEED CONNECT"
-    private val CONNECT = "CONNECT"
     private val context = this
     lateinit var manager : UsbManager
     var loopChk = true
@@ -41,36 +42,45 @@ class MainActivity : AppCompatActivity() {
     val change = App.prefs.change_switch
     val stay = App.prefs.stay_switch
     var reVal : Float? = null
+    val thread = ThreadClass()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        result_viewer.text = READY
+        // actionbar 색 변경
+        val actionBar = actionBar
+        actionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.customBlack)))
+
         main_title.text = App.prefs.sensor
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
         result_viewer.movementMethod = ScrollingMovementMethod()
 
         //임시로 클릭버튼 생성
-        connecting_btn.setOnClickListener {
-            startActivity(Intent(this, ConnectingActivity::class.java))
-        }
+//        connecting_btn.setOnClickListener {
+//            startActivity(Intent(this, ConnectingActivity::class.java))
+//        }
+
+        val filter = IntentFilter(ACTION_USB_PERMISSION)
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
+        registerReceiver(usbReceiver, filter)
 
         val deviceList : HashMap<String, UsbDevice> = manager.deviceList
         deviceList.values.forEach { d ->
             val permissionIntent =
                 PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
-            val filter = IntentFilter(ACTION_USB_PERMISSION)
-            registerReceiver(usbReceiver, filter)
             manager.requestPermission(d, permissionIntent)
         }
 
+
         main_measure_btn.setOnClickListener {
-            val thread = ThreadClass()
+            loopChk = true
             thread.start()
         }
+
     }
 
 
@@ -84,17 +94,14 @@ class MainActivity : AppCompatActivity() {
 
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
-                            //call method to set up device communication
-//                            val thread = ThreadClass()
-//                            thread.start()
-                            // 연결 되면 연결 성공 이미지를 넣는다거나 문구를 변경시킨다.
-                            result_viewer.text = CONNECT
+                            Log.d("MainActivity", "connect device")
+                            ready_layout.visibility = View.GONE
+                            connect_layout.visibility = View.VISIBLE
 
                         }
                     } else {
                         // 권한 허용이 안되어있는 경우
                         Log.d("device", "permission denied for device $device")
-                        result_viewer.text = READY
                     }
 
                 }
@@ -103,13 +110,19 @@ class MainActivity : AppCompatActivity() {
             if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
                 val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
                 device?.apply {
+                    Log.d("Main connect", "Disconnect")
                     ringOff()
+                    loopChk = false
                     // call your method that cleans up and closes communication with the device
-                    result_viewer.text = READY
+                    ready_layout.visibility = View.VISIBLE
+                    connect_layout.visibility = View.GONE
+
                 }
             }
         }
     }
+
+
     inner class ThreadClass() : Thread(){
 
         override fun run() {
@@ -284,6 +297,17 @@ class MainActivity : AppCompatActivity() {
         App.ringtone.run {
             if(isPlaying) stop()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("MainActivity", "onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("MainActivity", "Destroy")
+        unregisterReceiver(usbReceiver)
     }
 
 }

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">sensor</string>
+
+
+    <string name="needConnectText">연결이 필요합니다. NEED CONNECT</string>
+    <string name="readyText">READY</string>
 </resources>
