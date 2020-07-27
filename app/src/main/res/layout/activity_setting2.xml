@@ -95,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/setting_title_sensor_category"
-        android:text="산소센서"
+        android:text="@string/o2"
         android:textStyle="bold"
         android:gravity="left"
         android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
@@ -105,7 +105,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn1"
-        android:text="이산화탄소"
+        android:text="@string/co2"
         android:textStyle="bold"
         android:gravity="left"
         android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
@@ -115,7 +115,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn2"
-        android:text="일산화탄소"
+        android:text="@string/co"
         android:textStyle="bold"
         android:gravity="left"
         android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
@@ -125,7 +125,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn3"
-        android:text="산소센서"
+        android:text="@string/no2"
         android:textStyle="bold"
         android:gravity="left"
         android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
@@ -135,7 +135,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn4"
-        android:text="산소센서"
+        android:text="@string/so2"
         android:textStyle="bold"
         android:gravity="left"
         android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
@@ -145,17 +145,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn5"
-        android:text="산소센서"
+        android:text="@string/h2s"
         android:textStyle="bold"
         android:gravity="left"
         android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
         android:layout_marginStart="15dp"/>
-    <Button
-        android:id="@+id/sensor_btn_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="디테일이동"/>
 
 
 
