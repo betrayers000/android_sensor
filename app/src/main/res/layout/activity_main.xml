@@ -32,27 +32,33 @@
 <!--        app:layout_constraintBottom_toBottomOf="parent"-->
 <!--        app:layout_constraintRight_toRightOf="parent"-->
 <!--        app:layout_constraintVertical_bias="0.05"/>-->
-    <Button
+    <ImageButton
+
         android:id="@+id/main_measure_btn"
         android:text="측정하기"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.6"
-        android:layout_height="wrap_content"
+        app:layout_constraintWidth_percent="0.35"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintVertical_bias="0.83"/>
-    <Button
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintVertical_bias="0.9"/>
+    <ImageButton
+
         android:id="@+id/main_sound_off_btn"
         android:text="알림끄기"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.6"
-        android:layout_height="wrap_content"
+        app:layout_constraintWidth_percent="0.35"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintVertical_bias="0.9"/>
 
 

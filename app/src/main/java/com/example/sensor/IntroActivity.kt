@@ -12,5 +12,6 @@ class IntroActivity : AppCompatActivity() {
 
         val mainIntent = Intent(this, MainActivity::class.java)
         startActivity(mainIntent)
+        finish()
     }
 }

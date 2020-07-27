@@ -81,6 +81,10 @@ class MainActivity : AppCompatActivity() {
             thread.start()
         }
 
+        if (App.prefs.sensor != resources.getStringArray(R.array.sensor_lists)[0]){
+            result_viewer_tmp.visibility = View.GONE
+        }
+
     }
 
 

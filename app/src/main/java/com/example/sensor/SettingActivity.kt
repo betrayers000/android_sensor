@@ -79,9 +79,41 @@ class SettingActivity: AppCompatActivity() {
         // 기존에 설정한 값으로 불러오기
         sensor_spinner.setSelection(items3.indexOf(prefs.sensor))
 
-        // 디테일페이지시험
-        sensor_btn_detail.setOnClickListener {
-            startActivity(Intent(this, SensorDetailActivity::class.java))
+
+        sensor_btn1.setOnClickListener {
+            val intent = Intent(this, SensorDetailActivity::class.java)
+            intent.putExtra("sensor", resources.getString(R.string.o2))
+            startActivity(intent)
+        }
+
+        sensor_btn2.setOnClickListener {
+            val intent = Intent(this, SensorDetailActivity::class.java)
+            intent.putExtra("sensor", resources.getString(R.string.co2))
+            startActivity(intent)
+        }
+
+        sensor_btn3.setOnClickListener {
+            val intent = Intent(this, SensorDetailActivity::class.java)
+            intent.putExtra("sensor", resources.getString(R.string.co))
+            startActivity(intent)
+        }
+
+        sensor_btn4.setOnClickListener {
+            val intent = Intent(this, SensorDetailActivity::class.java)
+            intent.putExtra("sensor", resources.getString(R.string.no2))
+            startActivity(intent)
+        }
+
+        sensor_btn5.setOnClickListener {
+            val intent = Intent(this, SensorDetailActivity::class.java)
+            intent.putExtra("sensor", resources.getString(R.string.so2))
+            startActivity(intent)
+        }
+
+        sensor_btn6.setOnClickListener {
+            val intent = Intent(this, SensorDetailActivity::class.java)
+            intent.putExtra("sensor", resources.getString(R.string.h2s))
+            startActivity(intent)
         }
     }
 

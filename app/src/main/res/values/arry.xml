@@ -23,8 +23,11 @@
         <item>경고음</item>
     </string-array>
     <string-array name="sensor_lists">
-        <item>산소</item>
-        <item>이산화탄소</item>
-        <item>일산화탄소</item>
+        <item>산소 O₂</item>
+        <item>이산화탄소 CO₂</item>
+        <item>일산화탄소 CO</item>
+        <item>황화수소 H₂S</item>
+        <item>이산화질소 NO₂</item>
+        <item>이산화황 SO₂</item>
     </string-array>
 </resources>

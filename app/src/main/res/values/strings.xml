@@ -4,4 +4,11 @@
 
     <string name="needConnectText">연결이 필요합니다. NEED CONNECT</string>
     <string name="readyText">READY</string>
+
+    <string name="o2">산소 O₂</string>
+    <string name="co2">이산화탄소 CO₂</string>
+    <string name="co">일산화탄소 CO</string>
+    <string name="h2s">황화수소 H₂S</string>
+    <string name="no2">이산화질소 NO₂</string>
+    <string name="so2">이산화황 SO₂</string>
 </resources>
