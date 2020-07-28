@@ -11,4 +11,11 @@
     <string name="h2s">황화수소 H₂S</string>
     <string name="no2">이산화질소 NO₂</string>
     <string name="so2">이산화황 SO₂</string>
+
+    <string name="setting_base_set">기본설정 Base Set</string>
+    <string name="setting_sensor_set">측정 센서 선택 Sensor Select</string>
+    <string name="setting_sensor_setting">개별 센서 설정 Sensor Set</string>
+    <string name="setting_alarm_set">알람 소리 선택\nAlarm sound Select</string>
+    <string name="setting_sensor_category">센서 종류\nSensor Category</string>
+
 </resources>

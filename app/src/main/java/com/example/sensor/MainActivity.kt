@@ -7,11 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
 import android.hardware.usb.UsbDevice
-import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
-import android.media.RingtoneManager
 import android.os.Bundle
-import android.os.IBinder
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.Menu
@@ -19,30 +16,22 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.hoho.android.usbserial.driver.UsbSerialDriver
-import com.hoho.android.usbserial.driver.UsbSerialPort
-import com.hoho.android.usbserial.driver.UsbSerialProber
-import com.hoho.android.usbserial.util.SerialInputOutputManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
-import java.lang.Runnable
-import java.util.*
-import java.util.concurrent.Executors
 import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+    private val MAX_OPER = ">"
+    private val MIN_OPER = "<"
     private val context = this
     lateinit var manager : UsbManager
     var loopChk = true
     val danger = App.prefs.danger
-    val sound = App.prefs.sound
-    val change = App.prefs.change_switch
-    val stay = App.prefs.stay_switch
-    var reVal : Float? = null
     val thread = ThreadClass()
+    var minVal : Float? = null
+    var maxVal : Float? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -83,6 +72,48 @@ class MainActivity : AppCompatActivity() {
 
         if (App.prefs.sensor != resources.getStringArray(R.array.sensor_lists)[0]){
             result_viewer_tmp.visibility = View.GONE
+        }
+        when(App.prefs.sensor){
+            resources.getStringArray(R.array.sensor_lists)[0] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_o2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_o2.toString()
+                minVal = App.prefs.min_o2
+                maxVal = App.prefs.max_o2
+            }
+            resources.getStringArray(R.array.sensor_lists)[1] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_co2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
+                minVal = App.prefs.min_co2
+                maxVal = App.prefs.max_co2
+            }
+            resources.getStringArray(R.array.sensor_lists)[2] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_co.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_co.toString()
+                minVal = App.prefs.min_co
+                maxVal = App.prefs.max_co
+
+            }
+            resources.getStringArray(R.array.sensor_lists)[3] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_no2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_no2.toString()
+                minVal = App.prefs.min_no2
+                maxVal = App.prefs.max_no2
+
+            }
+            resources.getStringArray(R.array.sensor_lists)[4] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_so2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_so2.toString()
+                minVal = App.prefs.min_so2
+                maxVal = App.prefs.max_so2
+
+            }
+            resources.getStringArray(R.array.sensor_lists)[5] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_h2s.toString()
+                minVal = App.prefs.min_h2s
+                maxVal = App.prefs.max_h2s
+
+            }
         }
 
     }
@@ -160,6 +191,15 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     // 산소농도 값 넣기
                     result_viewer.text = sensorVal
+                    if (sensorVal.toFloat() < minVal!!){
+                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
+                        ringOn()
+                    } else if (sensorVal.toFloat() > maxVal!! ){
+                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
+                        ringOn()
+                    } else {
+                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
+                    }
                 }
             }
         }
@@ -192,15 +232,15 @@ class MainActivity : AppCompatActivity() {
                     // 산소농도 값 넣기
                     result_viewer.text = oxygen.toString() + " %"
                     // 산소농도에 따라 배경화면 색이 변함
-                    if (oxygen < danger){
+                    if (oxygen < minVal!!){
                         main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
                         ringOn()
-                    } else if (reVal != null && reVal!! - oxygen > 0.1){
+                    } else if (oxygen > maxVal!! ){
+                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
                         ringOn()
-                    } else{
+                    } else {
                         main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
                     }
-                    reVal = oxygen
 
                     // 온도 값 넣기
                     result_viewer_tmp.text = temp.toString()

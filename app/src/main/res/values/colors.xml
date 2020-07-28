@@ -7,7 +7,8 @@
     <color name="black">#000</color>
     <color name="blue">#3f51b5</color>
 
-    <color name="customGray">#59595c</color>
+    <color name="customDarkGray">#3e3d40</color>
+    <color name="customGray">#7b7d82</color>
     <color name="customBlack">#030304</color>
     <color name="customRed">#d71313</color>
 </resources>
