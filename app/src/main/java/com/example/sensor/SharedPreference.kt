@@ -14,11 +14,15 @@ class SharedPreference(context: Context) {
     val prefs_key_change_switch = "change_switch"
     val prefs_key_stay_switch = "stay_switch"
     val prefs_key_sensor = "sensor"
-    val prefs_key_min_switch = "min_switch"
-    val prefs_key_max_switch = "max_switch"
+
+    val prefs_key_min_switch_o2 = "min_switch_o2"
+    val prefs_key_max_switch_o2 = "max_switch_o2"
 
     val prefs_key_min_o2 = "min_o2"
     val prefs_key_max_o2 = "max_o2"
+
+    val prefs_key_min_switch_co2 = "min_switch_co2"
+    val prefs_key_max_switch_co2 = "max_switch_co2"
 
     val prefs_key_min_co2 = "min_co2"
     val prefs_key_max_co2 = "max_co2"
@@ -26,14 +30,26 @@ class SharedPreference(context: Context) {
     val prefs_key_min_co = "min_co"
     val prefs_key_max_co = "max_co"
 
+    val prefs_key_min_switch_co = "min_switch_co"
+    val prefs_key_max_switch_co = "max_switch_co"
+
     val prefs_key_min_no2 = "min_no2"
     val prefs_key_max_no2 = "max_no2"
+
+    val prefs_key_min_switch_no2 = "min_switch_no2"
+    val prefs_key_max_switch_no2 = "max_switch_no2"
 
     val prefs_key_min_so2 = "min_so2"
     val prefs_key_max_so2 = "max_so2"
 
+    val prefs_key_min_switch_so2 = "min_switch_so2"
+    val prefs_key_max_switch_so2 = "max_switch_so2"
+
     val prefs_key_min_h2s = "min_h2s"
     val prefs_key_max_h2s = "max_h2s"
+
+    val prefs_key_min_switch_h2s = "min_switch_h2s"
+    val prefs_key_max_switch_h2s = "max_switch_h2s"
 
     // method
     var danger: Float
@@ -56,15 +72,6 @@ class SharedPreference(context: Context) {
         get() = prefs.getString(prefs_key_sensor, "산소")!!
         set(value) = prefs.edit().putString(prefs_key_sensor, value).apply()
 
-    var min_switch: Boolean
-        get() = prefs.getBoolean(prefs_key_min_switch,true)
-        set(value) = prefs.edit().putBoolean(prefs_key_min_switch, value).apply()
-
-    var max_switch: Boolean
-        get() = prefs.getBoolean(prefs_key_max_switch,true)
-        set(value) = prefs.edit().putBoolean(prefs_key_max_switch, value).apply()
-
-
     var min_o2: Float
         get() = prefs.getFloat(prefs_key_min_o2, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_min_o2, value).apply()
@@ -73,6 +80,15 @@ class SharedPreference(context: Context) {
         get() = prefs.getFloat(prefs_key_max_o2, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_max_o2, value).apply()
 
+    var min_switch_o2: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch_o2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch_o2, value).apply()
+
+    var max_switch_o2: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch_o2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch_o2, value).apply()
+
+
 
     var min_co2: Float
         get() = prefs.getFloat(prefs_key_min_co2, 18.0F)
@@ -80,7 +96,17 @@ class SharedPreference(context: Context) {
 
     var max_co2: Float
         get() = prefs.getFloat(prefs_key_max_co2, 18.0F)
-        set(value) = prefs.edit().putFloat(prefs_key_max_o2, value).apply()
+        set(value) = prefs.edit().putFloat(prefs_key_max_co2, value).apply()
+
+
+
+    var min_switch_co2: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch_co2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch_co2, value).apply()
+
+    var max_switch_co2: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch_co2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch_co2, value).apply()
 
     var min_so2: Float
         get() = prefs.getFloat(prefs_key_min_so2, 18.0F)
@@ -90,6 +116,15 @@ class SharedPreference(context: Context) {
         get() = prefs.getFloat(prefs_key_max_so2, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_max_so2, value).apply()
 
+
+    var min_switch_so2: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch_so2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch_so2, value).apply()
+
+    var max_switch_so2: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch_so2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch_so2, value).apply()
+
     var min_no2: Float
         get() = prefs.getFloat(prefs_key_min_no2, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_min_no2, value).apply()
@@ -97,6 +132,15 @@ class SharedPreference(context: Context) {
     var max_no2: Float
         get() = prefs.getFloat(prefs_key_max_no2, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_max_no2, value).apply()
+
+
+    var min_switch_no2: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch_no2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch_no2, value).apply()
+
+    var max_switch_no2: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch_no2,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch_no2, value).apply()
 
     var min_co: Float
         get() = prefs.getFloat(prefs_key_min_co, 18.0F)
@@ -106,6 +150,15 @@ class SharedPreference(context: Context) {
         get() = prefs.getFloat(prefs_key_max_co, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_max_co, value).apply()
 
+
+    var min_switch_co: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch_co,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch_co, value).apply()
+
+    var max_switch_co: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch_co,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch_co, value).apply()
+
     var min_h2s: Float
         get() = prefs.getFloat(prefs_key_min_h2s, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_min_h2s, value).apply()
@@ -113,4 +166,14 @@ class SharedPreference(context: Context) {
     var max_h2s: Float
         get() = prefs.getFloat(prefs_key_max_h2s, 18.0F)
         set(value) = prefs.edit().putFloat(prefs_key_max_h2s, value).apply()
+
+
+    var min_switch_h2s: Boolean
+        get() = prefs.getBoolean(prefs_key_min_switch_h2s,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_min_switch_h2s, value).apply()
+
+    var max_switch_h2s: Boolean
+        get() = prefs.getBoolean(prefs_key_max_switch_h2s,true)
+        set(value) = prefs.edit().putBoolean(prefs_key_max_switch_h2s, value).apply()
+
 }

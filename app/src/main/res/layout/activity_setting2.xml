@@ -2,37 +2,42 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/customDarkGray"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <TextView
         android:id="@+id/setting_title_sound"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="기본설정"
+        android:text="@string/setting_base_set"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/setting_sound"
-        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintVertical_bias="0.05"
+        android:textColor="@color/white"
         android:textSize="23sp"
         android:layout_marginStart="15dp"
         android:textStyle="bold"/>
     <LinearLayout
+        android:layout_marginTop="5dp"
         android:id="@+id/setting_sound"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/setting_title_sound"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/setting_title_sensor"
-        android:background="@color/grey"
+        android:background="@color/customGray"
+        android:paddingStart="15dp"
         android:weightSum="1">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="알림소리설정"
+            android:text="@string/setting_alarm_set"
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="15dp"
+            android:textColor="@color/white"
             android:layout_weight="0.5"/>
         <Spinner
             android:id="@+id/sound_spinner"
@@ -45,32 +50,37 @@
         android:id="@+id/setting_title_sensor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="측정센서선택"
+        android:text="@string/setting_sensor_set"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_sound"
         app:layout_constraintBottom_toBottomOf="@id/setting_sensor"
         android:textSize="23sp"
+        android:textColor="@color/white"
         android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"/>
+
     <LinearLayout
+        android:layout_marginTop="5dp"
         android:id="@+id/setting_sensor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/setting_title_sensor"
         android:orientation="horizontal"
         app:layout_constraintVertical_bias="0.1"
-        android:background="@color/grey"
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:background="@color/customGray"
         android:weightSum="1">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="센서종류"
+            android:text="@string/setting_sensor_category"
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="15dp"
+            android:textColor="@color/white"
             android:layout_weight="0.5"/>
         <Spinner
             android:id="@+id/sensor_spinner"
@@ -82,74 +92,94 @@
         android:id="@+id/setting_title_sensor_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="센서 설정"
+        android:text="@string/setting_sensor_setting"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_sensor"
         app:layout_constraintBottom_toBottomOf="parent"
         android:textSize="23sp"
-        android:layout_marginStart="15dp"
-        app:layout_constraintVertical_bias="0.1"
+        android:paddingStart="15dp"
+        app:layout_constraintVertical_bias="0.05"
+        android:textColor="@color/white"
+
         android:textStyle="bold"/>
     <Button
+        android:layout_marginTop="5dp"
+        android:background="@color/customGray"
+        android:textColor="@color/white"
         android:id="@+id/sensor_btn1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/setting_title_sensor_category"
         android:text="@string/o2"
         android:textStyle="bold"
-        android:gravity="left"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
-        android:layout_marginStart="15dp"/>
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black" />
     <Button
+        android:layout_marginTop="5dp"
+        android:background="@color/customGray"
+        android:textColor="@color/white"
         android:id="@+id/sensor_btn2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn1"
         android:text="@string/co2"
         android:textStyle="bold"
-        android:gravity="left"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
-        android:layout_marginStart="15dp"/>
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black" />
     <Button
+        android:layout_marginTop="5dp"
+        android:background="@color/customGray"
+        android:textColor="@color/white"
         android:id="@+id/sensor_btn3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn2"
         android:text="@string/co"
         android:textStyle="bold"
-        android:gravity="left"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
-        android:layout_marginStart="15dp"/>
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black" />
     <Button
+        android:layout_marginTop="5dp"
+        android:background="@color/customGray"
+        android:textColor="@color/white"
         android:id="@+id/sensor_btn4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn3"
         android:text="@string/no2"
         android:textStyle="bold"
-        android:gravity="left"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
-        android:layout_marginStart="15dp"/>
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black" />
     <Button
+        android:layout_marginTop="5dp"
+        android:background="@color/customGray"
+        android:textColor="@color/white"
         android:id="@+id/sensor_btn5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn4"
         android:text="@string/so2"
         android:textStyle="bold"
-        android:gravity="left"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
-        android:layout_marginStart="15dp"/>
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black" />
     <Button
+        android:layout_marginTop="5dp"
+        android:background="@color/customGray"
+        android:textColor="@color/white"
         android:id="@+id/sensor_btn6"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/sensor_btn5"
         android:text="@string/h2s"
         android:textStyle="bold"
-        android:gravity="left"
-        android:drawableRight="@drawable/ic_keyboard_arrow_right_black"
-        android:layout_marginStart="15dp"/>
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_black" />
 
 
 

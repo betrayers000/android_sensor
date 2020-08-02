@@ -5,13 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.hardware.usb.UsbDevice
-import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
-import android.media.RingtoneManager
 import android.os.Bundle
-import android.os.IBinder
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.Menu
@@ -19,30 +17,22 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.hoho.android.usbserial.driver.UsbSerialDriver
-import com.hoho.android.usbserial.driver.UsbSerialPort
-import com.hoho.android.usbserial.driver.UsbSerialProber
-import com.hoho.android.usbserial.util.SerialInputOutputManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
-import java.lang.Runnable
-import java.util.*
-import java.util.concurrent.Executors
-import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity() {
 
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+    private val MAX_OPER = "> "
+    private val MIN_OPER = "< "
     private val context = this
     lateinit var manager : UsbManager
+    var connect = false
     var loopChk = true
     val danger = App.prefs.danger
-    val sound = App.prefs.sound
-    val change = App.prefs.change_switch
-    val stay = App.prefs.stay_switch
-    var reVal : Float? = null
     val thread = ThreadClass()
+    var minVal : Float? = null
+    var maxVal : Float? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -50,18 +40,39 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // actionbar 색 변경
-        val actionBar = actionBar
-        actionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.customBlack)))
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.customBlack)))
+            actionBar.title = App.prefs.sensor
+        }
 
         main_title.text = App.prefs.sensor
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
         result_viewer.movementMethod = ScrollingMovementMethod()
 
-        //임시로 클릭버튼 생성
-//        connecting_btn.setOnClickListener {
-//            startActivity(Intent(this, ConnectingActivity::class.java))
+        // meter set
+//        meter.setLabelConverter(object : SpeedometerGauge.LabelConverter {
+//            override fun getLabelFor(
+//                progress: Double,
+//                maxProgress: Double
+//            ): String? {
+//                return Math.round(progress).toString()
+//            }
+//        })
+//
+//        meter.setMaxSpeed(300.0)
+//        meter.setMajorTickStep(30.0)
+//        meter.setMinorTicks(2)
+//        meter.addColoredRange(0.0, 60.0, Color.GREEN)
+//        meter.addColoredRange(60.0, 180.0, Color.RED)
+//
+//
+//        main_sound_off_btn.setOnClickListener{
+//            meter.setSpeed(180.0, true)
+//            meter.setUnitsText("500")
 //        }
+
 
         val filter = IntentFilter(ACTION_USB_PERMISSION)
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
@@ -76,13 +87,74 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        main_measure_btn.setOnClickListener {
-            loopChk = true
-            thread.start()
+//        main_measure_btn.setOnClickListener{
+//            if (connect){
+//                loopChk = true
+//                thread.start()
+//            }
+//        }
+//
+//        main_sound_off_btn.setOnClickListener {
+//            ringOff()
+//        }
+        measure_toggle_btn.setOnCheckedChangeListener { buttonView, isChecked ->
+
+            if(!connect){
+                measure_toggle_btn.isChecked = false
+            } else {
+                if(isChecked){
+                    loopChk = true
+                    thread.start()
+                } else {
+                    ringOff()
+                }
+            }
         }
 
         if (App.prefs.sensor != resources.getStringArray(R.array.sensor_lists)[0]){
             result_viewer_tmp.visibility = View.GONE
+        }
+        when(App.prefs.sensor){
+            resources.getStringArray(R.array.sensor_lists)[0] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_o2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_o2.toString()
+                minVal = App.prefs.min_o2
+                maxVal = App.prefs.max_o2
+            }
+            resources.getStringArray(R.array.sensor_lists)[1] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_co2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
+                minVal = App.prefs.min_co2
+                maxVal = App.prefs.max_co2
+            }
+            resources.getStringArray(R.array.sensor_lists)[2] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_co.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_co.toString()
+                minVal = App.prefs.min_co
+                maxVal = App.prefs.max_co
+
+            }
+            resources.getStringArray(R.array.sensor_lists)[3] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_no2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_no2.toString()
+                minVal = App.prefs.min_no2
+                maxVal = App.prefs.max_no2
+
+            }
+            resources.getStringArray(R.array.sensor_lists)[4] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_so2.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_so2.toString()
+                minVal = App.prefs.min_so2
+                maxVal = App.prefs.max_so2
+
+            }
+            resources.getStringArray(R.array.sensor_lists)[5] -> {
+                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
+                result_viewer_max.text = MAX_OPER + App.prefs.max_h2s.toString()
+                minVal = App.prefs.min_h2s
+                maxVal = App.prefs.max_h2s
+
+            }
         }
 
     }
@@ -101,7 +173,7 @@ class MainActivity : AppCompatActivity() {
                             Log.d("MainActivity", "connect device")
                             ready_layout.visibility = View.GONE
                             connect_layout.visibility = View.VISIBLE
-
+                            connect = true
                         }
                     } else {
                         // 권한 허용이 안되어있는 경우
@@ -117,9 +189,11 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Main connect", "Disconnect")
                     ringOff()
                     loopChk = false
+                    connect = false
                     // call your method that cleans up and closes communication with the device
                     ready_layout.visibility = View.VISIBLE
                     connect_layout.visibility = View.GONE
+                    measure_toggle_btn.isChecked = false
 
                 }
             }
@@ -138,6 +212,18 @@ class MainActivity : AppCompatActivity() {
                     co2Sensor()
                 }
                 resources.getStringArray(R.array.sensor_lists)[2] -> {
+                    tbSensor()
+                }
+                resources.getStringArray(R.array.sensor_lists)[3] -> {
+                    tbSensor()
+                }
+                resources.getStringArray(R.array.sensor_lists)[4] -> {
+                    tbSensor()
+                }
+                resources.getStringArray(R.array.sensor_lists)[5] -> {
+                    tbSensor()
+                }
+                resources.getStringArray(R.array.sensor_lists)[6] -> {
                     tbSensor()
                 }
             }
@@ -159,7 +245,19 @@ class MainActivity : AppCompatActivity() {
                 val sensorVal = msg.split(" ")[2]
                 runOnUiThread {
                     // 산소농도 값 넣기
-                    result_viewer.text = sensorVal
+                    result_viewer.text = sensorVal + " %"
+                    if (sensorVal.toFloat() < minVal!!){
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+                        ringOn()
+                    } else if (sensorVal.toFloat() > maxVal!! ){
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+                        ringOn()
+                    } else {
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_greenview)
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customGreen))
+                    }
                 }
             }
         }
@@ -192,15 +290,18 @@ class MainActivity : AppCompatActivity() {
                     // 산소농도 값 넣기
                     result_viewer.text = oxygen.toString() + " %"
                     // 산소농도에 따라 배경화면 색이 변함
-                    if (oxygen < danger){
-                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
+                    if (oxygen < minVal!!){
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         ringOn()
-                    } else if (reVal != null && reVal!! - oxygen > 0.1){
+                    } else if (oxygen > maxVal!! ){
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         ringOn()
-                    } else{
-                        main_background.setBackgroundColor(ContextCompat.getColor(context, R.color.green))
+                    } else {
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customGreen))
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_greenview)
                     }
-                    reVal = oxygen
 
                     // 온도 값 넣기
                     result_viewer_tmp.text = temp.toString()
@@ -240,30 +341,29 @@ class MainActivity : AppCompatActivity() {
     fun tbSensor(){
         val command = byteArrayOfInt(0xFF, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x78)
         val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
-        val result = serialCommunication.write(command)
-        runOnUiThread {
-            // 산소농도 값 넣기
-            result_viewer.text = result
+        while(loopChk){
+            val result = serialCommunication.write(command)
+
+            if (result != null) {
+                val ppm = result.toFloat()/1000
+                runOnUiThread {
+                    // 산소농도 값 넣기
+                    result_viewer.text = ppm.toString() + " ppm"
+                    if (ppm < minVal!!){
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+                        ringOn()
+                    } else if (ppm > maxVal!! ){
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+                        ringOn()
+                    } else {
+//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_greenview)
+                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customGreen))
+                    }
+                }
+            }
         }
-//        val port = serialCommunication.port
-//        val mListener: SerialInputOutputManager.Listener =
-//            object : SerialInputOutputManager.Listener {
-//                override fun onRunError(e: java.lang.Exception) {
-//                    Log.d("tbSensor", "Runner stopped.")
-//                }
-//
-//                override fun onNewData(data: ByteArray) {
-//                    runOnUiThread {
-//                        // 산소농도 값 넣기
-//                        result_viewer.text = data.toString()
-//                    }
-//
-//                }
-//            }
-//
-//        val serialInputOutputManager = SerialInputOutputManager(port, mListener)
-//        Executors.newSingleThreadExecutor().submit(serialInputOutputManager)
-//        port.write(command, 1000)
     }
 
     /**

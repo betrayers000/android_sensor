@@ -116,10 +116,20 @@ class SerialCommunication(
                                 val byteArray = buffer.copyOf(len)
 //                                val encode = String(byteArray, Charsets.US_ASCII)
 //                                resultString += encode
-                                val num = Integer.parseInt(byteArray[2].toString(), 16)
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[0].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[1].toString() )
                                 Log.d(SC_TAG, "Write & Read START job result : " + byteArray[2].toString() )
-                                resultString += num
-                                resultString += (byteArray[2] * 256 + byteArray[2]).toString()
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[3].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[4].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[5].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[6].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[7].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[8].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[9].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[10].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[11].toString() )
+                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[12].toString() )
+                                resultString += (byteArray[6] * 256 + byteArray[7]).toString()
                                 Log.d(SC_TAG, "Write & Read START job result : " + resultString )
                                 check = false
                             }

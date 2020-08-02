@@ -59,7 +59,6 @@
         app:layout_constraintTop_toBottomOf="@id/sensor_text_min"
         app:layout_constraintBottom_toTopOf="@id/sensor_text_max"
         app:layout_constraintVertical_bias="0.7"
-        android:text="30.5% 미만시 알람이 울립니다."
         android:layout_marginStart="15dp"/>
 
     <!--  최고농도 알림  -->
@@ -105,7 +104,6 @@
         app:layout_constraintTop_toBottomOf="@id/sensor_text_max"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.2"
-        android:text="30.5% 초과시 알람이 울립니다."
         android:layout_marginStart="15dp"/>
 
 
