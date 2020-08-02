@@ -29,5 +29,6 @@
         <item>이산화질소 NO₂</item>
         <item>이산화황 SO₂</item>
         <item>황화수소 H₂S</item>
+        <item>포름알데히드 CH₂O</item>
     </string-array>
 </resources>
