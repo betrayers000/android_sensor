@@ -2,7 +2,7 @@
     <string name="app_name">sensor</string>
 
 
-    <string name="needConnectText">연결이 필요합니다. NEED CONNECT</string>
+    <string name="needConnectText">센서를 연결하세요. Connect the Sensor</string>
     <string name="readyText">READY</string>
 
     <string name="o2">산소 O₂</string>
@@ -11,11 +11,21 @@
     <string name="h2s">황화수소 H₂S</string>
     <string name="no2">이산화질소 NO₂</string>
     <string name="so2">이산화황 SO₂</string>
+    <string name="hcho">포름알데히드 HCHO</string>
 
     <string name="setting_base_set">기본설정 Base Set</string>
     <string name="setting_sensor_set">측정 센서 선택 Sensor Select</string>
     <string name="setting_sensor_setting">개별 센서 설정 Sensor Set</string>
     <string name="setting_alarm_set">알람 소리 선택\nAlarm sound Select</string>
     <string name="setting_sensor_category">센서 종류\nSensor Category</string>
+    <string name="setting_sensor_alarm_value">알람 설정 값 Alarm setting Value</string>
+
+    <string name="alarm_o2">산소 18% 미만 또는 23.5% 초과\nO₂ under 18% or over 23.5%</string>
+    <string name="alarm_co2">이산화탄소 3% 초과\nCO₂ over 3%</string>
+    <string name="alarm_co">일산화탄소 1000ppm 초과\nCO over 1000ppm</string>
+    <string name="alarm_h2s">황화수소 15ppm 초과\nH₂S over 15ppm</string>
+    <string name="alarm_no2">이산화질소 5ppm 초과\nNO₂ over 5ppm</string>
+    <string name="alarm_so2">이산화황 5ppm 초과\nSO₂ over 5ppm</string>
+    <string name="alarm_hcho">포름알데히드 0.1ppm 초과\nHCHO over 0.1ppm</string>
 
 </resources>

@@ -17,7 +17,13 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.github.anastr.speedviewlib.components.Section
+import com.github.anastr.speedviewlib.components.Style
+import com.github.anastr.speedviewlib.components.indicators.Indicator
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.math.min
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +39,8 @@ class MainActivity : AppCompatActivity() {
     val thread = ThreadClass()
     var minVal : Float? = null
     var maxVal : Float? = null
+    var measureMax : Float? = null
+    var unit : String = "ppm"
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -49,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         main_title.text = App.prefs.sensor
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
-        result_viewer.movementMethod = ScrollingMovementMethod()
+//        result_viewer.movementMethod = ScrollingMovementMethod()
 
         // meter set
 //        meter.setLabelConverter(object : SpeedometerGauge.LabelConverter {
@@ -116,46 +124,96 @@ class MainActivity : AppCompatActivity() {
         }
         when(App.prefs.sensor){
             resources.getStringArray(R.array.sensor_lists)[0] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_o2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_o2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_o2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_o2.toString()
+//                result_viewer_min.visibility = View.VISIBLE
                 minVal = App.prefs.min_o2
                 maxVal = App.prefs.max_o2
+                measureMax = 25.0f
+                unit = "%"
             }
             resources.getStringArray(R.array.sensor_lists)[1] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_co2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_co2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
                 minVal = App.prefs.min_co2
-                maxVal = App.prefs.max_co2
+//                maxVal = App.prefs.max_co2
+                maxVal = 30000f
+                measureMax = 200000f
+                unit = "ppm"
+                result_viewer_tmp.visibility = View.VISIBLE
+                result_viewer_tmp.text = "percent"
+                result_viewer.onPrintTickLabel = {
+                        tickPosition: Int, tick: Float ->
+                    if (tick >= 10000) {
+                        String.format(Locale.getDefault(), "%.1f", tick/10000)
+                    }
+                    else {
+                        null
+                    }
+                }
             }
             resources.getStringArray(R.array.sensor_lists)[2] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_co.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_co.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_co.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_co.toString()
                 minVal = App.prefs.min_co
                 maxVal = App.prefs.max_co
+                measureMax = 1000.0f
 
             }
             resources.getStringArray(R.array.sensor_lists)[3] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_no2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_no2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_no2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_no2.toString()
                 minVal = App.prefs.min_no2
                 maxVal = App.prefs.max_no2
+                measureMax = 100.0f
 
             }
             resources.getStringArray(R.array.sensor_lists)[4] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_so2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_so2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_so2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_so2.toString()
                 minVal = App.prefs.min_so2
                 maxVal = App.prefs.max_so2
-
+                measureMax = 100.0f
             }
             resources.getStringArray(R.array.sensor_lists)[5] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_h2s.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_h2s.toString()
                 minVal = App.prefs.min_h2s
                 maxVal = App.prefs.max_h2s
-
+                measureMax = 100.0f
+            }
+            resources.getStringArray(R.array.sensor_lists)[6] -> {
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_hcho.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_hcho.toString()
+                minVal = App.prefs.min_hcho
+                maxVal = App.prefs.max_hcho
+                measureMax = 1000.0f
             }
         }
+        result_viewer.maxSpeed = measureMax!!
+        val minV = minVal!!/measureMax!!
+        val maxV = maxVal!!/measureMax!!
+        Log.d("speed", minVal.toString())
+        Log.d("speed", maxVal.toString())
+        Log.d("speed", minV.toString())
+        Log.d("speed", maxV.toString())
+        val minSection = Section(0f, minV, Color.RED, result_viewer.speedometerWidth, Style.BUTT)
+        val middleSection = Section(minV, maxV, Color.BLUE, result_viewer.speedometerWidth, Style.BUTT)
+        result_viewer.clearSections()
+        val maxSection = Section(maxV, 1f, Color.RED, result_viewer.speedometerWidth, Style.BUTT)
+        if (minV == 0f){
+            if (maxV == 1.0f){
+                result_viewer.addSections(middleSection)
+            } else {
+                result_viewer.addSections(middleSection, maxSection)
+            }
+        } else {
+            result_viewer.addSections(minSection, middleSection, maxSection)
+        }
+        result_viewer.unit = unit
+        result_viewer.tickNumber = 4
+        result_viewer.setIndicator(Indicator.Indicators.SpindleIndicator)
+        result_viewer.ticks = arrayListOf(0f, minV, maxV, 1f)
 
     }
 
@@ -245,12 +303,14 @@ class MainActivity : AppCompatActivity() {
                 val sensorVal = msg.split(" ")[2]
                 runOnUiThread {
                     // 산소농도 값 넣기
-                    result_viewer.text = sensorVal + " %"
-                    if (sensorVal.toFloat() < minVal!!){
+//                    result_viewer.text = sensorVal + " %"
+                    result_viewer.speedTo(sensorVal.toFloat())
+                    result_viewer_tmp.text = (sensorVal.toFloat()/10000).toString() + " %"
+                    if (sensorVal.toFloat()/10000 < minVal!!){
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
                         ringOn()
-                    } else if (sensorVal.toFloat() > maxVal!! ){
+                    } else if (sensorVal.toFloat()/10000 > maxVal!! ){
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
                         ringOn()
@@ -288,7 +348,8 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
 
                     // 산소농도 값 넣기
-                    result_viewer.text = oxygen.toString() + " %"
+//                    result_viewer.text = oxygen.toString() + " %"
+                    result_viewer.speedTo(oxygen)
                     // 산소농도에 따라 배경화면 색이 변함
                     if (oxygen < minVal!!){
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
@@ -348,7 +409,8 @@ class MainActivity : AppCompatActivity() {
                 val ppm = result.toFloat()/1000
                 runOnUiThread {
                     // 산소농도 값 넣기
-                    result_viewer.text = ppm.toString() + " ppm"
+//                    result_viewer.text = ppm.toString() + " ppm"
+                    result_viewer.speedTo(ppm)
                     if (ppm < minVal!!){
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
