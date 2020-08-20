@@ -130,7 +130,11 @@ class SerialCommunication(
 //                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[10].toString() )
 //                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[11].toString() )
 //                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[12].toString() )
-                                resultString += (byteArray[6] * 256 + byteArray[7]).toString()
+                                if (command.size == 1){
+                                    resultString += byteArray[0].toString()
+                                } else {
+                                    resultString += (byteArray[6] * 256 + byteArray[7]).toString()
+                                }
                                 check = false
                             }
                         } catch (e: Exception){
