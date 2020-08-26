@@ -138,15 +138,15 @@ class MainActivity : AppCompatActivity() {
 //                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
                 minVal = App.prefs.min_co2
 //                maxVal = App.prefs.max_co2
-                maxVal = 3000f
-                measureMax = 20000f
+                maxVal = 30000f
+                measureMax = 200000f
                 unit = "ppm"
                 result_viewer_tmp.visibility = View.VISIBLE
                 result_viewer_tmp.text = "percent"
                 result_viewer.onPrintTickLabel = {
                         tickPosition: Int, tick: Float ->
                     if (tick >= 1000) {
-                        String.format(Locale.getDefault(), "%.1f", tick/1000)
+                        String.format(Locale.getDefault(), "%.1f", tick/10000)
                     }
                     else {
                         null
@@ -159,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                 minVal = App.prefs.min_co
                 maxVal = App.prefs.max_co
                 measureMax = 1000.0f
+                unit = "ppb"
 
             }
             resources.getStringArray(R.array.sensor_lists)[3] -> {
@@ -167,6 +168,7 @@ class MainActivity : AppCompatActivity() {
                 minVal = App.prefs.min_no2
                 maxVal = App.prefs.max_no2
                 measureMax = 100.0f
+                unit = "ppb"
 
             }
             resources.getStringArray(R.array.sensor_lists)[4] -> {
@@ -175,6 +177,7 @@ class MainActivity : AppCompatActivity() {
                 minVal = App.prefs.min_so2
                 maxVal = App.prefs.max_so2
                 measureMax = 100.0f
+                unit = "ppb"
             }
             resources.getStringArray(R.array.sensor_lists)[5] -> {
 //                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
@@ -182,6 +185,7 @@ class MainActivity : AppCompatActivity() {
                 minVal = App.prefs.min_h2s
                 maxVal = App.prefs.max_h2s
                 measureMax = 100.0f
+                unit = "ppb"
             }
             resources.getStringArray(R.array.sensor_lists)[6] -> {
 //                result_viewer_min.text = MIN_OPER + App.prefs.min_hcho.toString()
@@ -189,6 +193,7 @@ class MainActivity : AppCompatActivity() {
                 minVal = App.prefs.min_hcho
                 maxVal = App.prefs.max_hcho
                 measureMax = 1000.0f
+                unit = "ppb"
             }
         }
         result_viewer.maxSpeed = measureMax!!
@@ -233,6 +238,7 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             Log.d("MainActivity", "connect device")
+                            Log.d("MainActivity", tbSensorCheck(getSensorType()).toString())
                             if (tbSensorCheck(getSensorType())){
                                 ready_layout.visibility = View.GONE
                                 connect_layout.visibility = View.VISIBLE
@@ -315,8 +321,9 @@ class MainActivity : AppCompatActivity() {
 //                    result_viewer.text = sensorVal + " %"
 
                     try{
-                        result_viewer.speedTo(sensorVal.toFloat())
-                        result_viewer_tmp.text = (sensorVal.toFloat()/1000).toString() + " %"
+                        val co2val = sensorVal.toFloat() * 10
+                        result_viewer.speedTo(co2val)
+                        result_viewer_tmp.text = (co2val/10000).toString() + " %"
                         Log.d("MainActivity", maxVal.toString())
                         if (sensorVal.toFloat() < minVal!!){
     //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
@@ -414,23 +421,25 @@ class MainActivity : AppCompatActivity() {
     /**
      * TB 센서 함수
      */
+    @ExperimentalUnsignedTypes
     fun tbSensor(){
         val command = byteArrayOfInt(0xFF, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x78)
         val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
         while(loopChk){
             val result = serialCommunication.write(command)
-
+            Log.d("MainAcitvity", result.toString())
             if (result != null) {
-                val ppm = result.toFloat()/1000
+                val ppb = result.toFloat()
+                Log.d("MainActivity", ppb.toString())
                 runOnUiThread {
                     // 산소농도 값 넣기
 //                    result_viewer.text = ppm.toString() + " ppm"
-                    result_viewer.speedTo(ppm)
-                    if (ppm < minVal!!){
+                    result_viewer.speedTo(ppb)
+                    if (ppb < minVal!!){
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
                         ringOn()
-                    } else if (ppm > maxVal!! ){
+                    } else if (ppb > maxVal!! ){
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
                         ringOn()
@@ -450,6 +459,9 @@ class MainActivity : AppCompatActivity() {
         val command = byteArrayOfInt(0xD1)
         val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
         val result = serialCommunication.write(command)
+        Log.d("MainActivity", result.toString())
+        Log.d("MainActivity", type)
+
         if (!result.equals(type)){
             return false
         }

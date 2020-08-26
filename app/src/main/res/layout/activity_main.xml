@@ -68,6 +68,7 @@
                     app:sv_unitTextSize="30sp"
                     app:sv_textColor="@color/white"
                     app:sv_textSize="15sp"
+                    app:sv_speedTextFormat="INTEGER"
                     android:id="@+id/result_viewer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
