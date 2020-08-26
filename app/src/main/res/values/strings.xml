@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">sensor</string>
+    <string name="app_name">AllSensor</string>
 
 
     <string name="needConnectText">센서를 연결하세요. Connect the Sensor</string>
