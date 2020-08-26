@@ -17,7 +17,14 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.github.anastr.speedviewlib.components.Section
+import com.github.anastr.speedviewlib.components.Style
+import com.github.anastr.speedviewlib.components.indicators.Indicator
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.math.min
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,12 +40,14 @@ class MainActivity : AppCompatActivity() {
     val thread = ThreadClass()
     var minVal : Float? = null
     var maxVal : Float? = null
+    var measureMax : Float? = null
+    var unit : String = "ppm"
+    private var defaultTime : Long = 1597932005417
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         // actionbar 색 변경
         val actionBar = supportActionBar
         if (actionBar != null) {
@@ -49,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         main_title.text = App.prefs.sensor
         manager = getSystemService(Context.USB_SERVICE) as UsbManager
 
-        result_viewer.movementMethod = ScrollingMovementMethod()
+//        result_viewer.movementMethod = ScrollingMovementMethod()
 
         // meter set
 //        meter.setLabelConverter(object : SpeedometerGauge.LabelConverter {
@@ -116,50 +125,103 @@ class MainActivity : AppCompatActivity() {
         }
         when(App.prefs.sensor){
             resources.getStringArray(R.array.sensor_lists)[0] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_o2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_o2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_o2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_o2.toString()
+//                result_viewer_min.visibility = View.VISIBLE
                 minVal = App.prefs.min_o2
                 maxVal = App.prefs.max_o2
+                measureMax = 25.0f
+                unit = "%"
             }
             resources.getStringArray(R.array.sensor_lists)[1] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_co2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_co2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_co2.toString()
                 minVal = App.prefs.min_co2
-                maxVal = App.prefs.max_co2
+//                maxVal = App.prefs.max_co2
+                maxVal = 3000f
+                measureMax = 20000f
+                unit = "ppm"
+                result_viewer_tmp.visibility = View.VISIBLE
+                result_viewer_tmp.text = "percent"
+                result_viewer.onPrintTickLabel = {
+                        tickPosition: Int, tick: Float ->
+                    if (tick >= 1000) {
+                        String.format(Locale.getDefault(), "%.1f", tick/1000)
+                    }
+                    else {
+                        null
+                    }
+                }
             }
             resources.getStringArray(R.array.sensor_lists)[2] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_co.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_co.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_co.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_co.toString()
                 minVal = App.prefs.min_co
                 maxVal = App.prefs.max_co
+                measureMax = 1000.0f
 
             }
             resources.getStringArray(R.array.sensor_lists)[3] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_no2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_no2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_no2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_no2.toString()
                 minVal = App.prefs.min_no2
                 maxVal = App.prefs.max_no2
+                measureMax = 100.0f
 
             }
             resources.getStringArray(R.array.sensor_lists)[4] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_so2.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_so2.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_so2.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_so2.toString()
                 minVal = App.prefs.min_so2
                 maxVal = App.prefs.max_so2
-
+                measureMax = 100.0f
             }
             resources.getStringArray(R.array.sensor_lists)[5] -> {
-                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
-                result_viewer_max.text = MAX_OPER + App.prefs.max_h2s.toString()
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_h2s.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_h2s.toString()
                 minVal = App.prefs.min_h2s
                 maxVal = App.prefs.max_h2s
-
+                measureMax = 100.0f
+            }
+            resources.getStringArray(R.array.sensor_lists)[6] -> {
+//                result_viewer_min.text = MIN_OPER + App.prefs.min_hcho.toString()
+//                result_viewer_max.text = MAX_OPER + App.prefs.max_hcho.toString()
+                minVal = App.prefs.min_hcho
+                maxVal = App.prefs.max_hcho
+                measureMax = 1000.0f
             }
         }
+        result_viewer.maxSpeed = measureMax!!
+        val minV = minVal!!/measureMax!!
+        val maxV = maxVal!!/measureMax!!
+        Log.d("speed", minVal.toString())
+        Log.d("speed", maxVal.toString())
+        Log.d("speed", minV.toString())
+        Log.d("speed", maxV.toString())
+        val minSection = Section(0f, minV, Color.RED, result_viewer.speedometerWidth, Style.BUTT)
+        val middleSection = Section(minV, maxV, Color.BLUE, result_viewer.speedometerWidth, Style.BUTT)
+        result_viewer.clearSections()
+        val maxSection = Section(maxV, 1f, Color.RED, result_viewer.speedometerWidth, Style.BUTT)
+        if (minV == 0f){
+            if (maxV == 1.0f){
+                result_viewer.addSections(middleSection)
+            } else {
+                result_viewer.addSections(middleSection, maxSection)
+            }
+        } else {
+            result_viewer.addSections(minSection, middleSection, maxSection)
+        }
+        result_viewer.unit = unit
+        result_viewer.tickNumber = 4
+        result_viewer.setIndicator(Indicator.Indicators.SpindleIndicator)
+        result_viewer.ticks = arrayListOf(0f, minV, maxV, 1f)
 
     }
 
 
+    /**
+     *  usb 연결 / 연결해제시 실행되는 작업
+     */
     private val usbReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
@@ -171,9 +233,13 @@ class MainActivity : AppCompatActivity() {
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
                             Log.d("MainActivity", "connect device")
-                            ready_layout.visibility = View.GONE
-                            connect_layout.visibility = View.VISIBLE
-                            connect = true
+                            if (tbSensorCheck(getSensorType())){
+                                ready_layout.visibility = View.GONE
+                                connect_layout.visibility = View.VISIBLE
+                                connect = true
+                            } else {
+                                connect_msg.text = resources.getString(R.string.needCorrectText)
+                            }
                         }
                     } else {
                         // 권한 허용이 안되어있는 경우
@@ -194,6 +260,7 @@ class MainActivity : AppCompatActivity() {
                     ready_layout.visibility = View.VISIBLE
                     connect_layout.visibility = View.GONE
                     measure_toggle_btn.isChecked = false
+                    connect_msg.text = resources.getString(R.string.needConnectText)
 
                 }
             }
@@ -245,18 +312,26 @@ class MainActivity : AppCompatActivity() {
                 val sensorVal = msg.split(" ")[2]
                 runOnUiThread {
                     // 산소농도 값 넣기
-                    result_viewer.text = sensorVal + " %"
-                    if (sensorVal.toFloat() < minVal!!){
-//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
-                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
-                        ringOn()
-                    } else if (sensorVal.toFloat() > maxVal!! ){
-//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
-                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
-                        ringOn()
-                    } else {
-//                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_greenview)
-                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customGreen))
+//                    result_viewer.text = sensorVal + " %"
+
+                    try{
+                        result_viewer.speedTo(sensorVal.toFloat())
+                        result_viewer_tmp.text = (sensorVal.toFloat()/1000).toString() + " %"
+                        Log.d("MainActivity", maxVal.toString())
+                        if (sensorVal.toFloat() < minVal!!){
+    //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
+                            connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+                            ringOn()
+                        } else if (sensorVal.toFloat() > maxVal!! ){
+    //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
+                            connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
+                            ringOn()
+                        } else {
+    //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_greenview)
+                            connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customGreen))
+                        }
+                    } catch (e : Exception){
+
                     }
                 }
             }
@@ -288,7 +363,8 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
 
                     // 산소농도 값 넣기
-                    result_viewer.text = oxygen.toString() + " %"
+//                    result_viewer.text = oxygen.toString() + " %"
+                    result_viewer.speedTo(oxygen)
                     // 산소농도에 따라 배경화면 색이 변함
                     if (oxygen < minVal!!){
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
@@ -348,7 +424,8 @@ class MainActivity : AppCompatActivity() {
                 val ppm = result.toFloat()/1000
                 runOnUiThread {
                     // 산소농도 값 넣기
-                    result_viewer.text = ppm.toString() + " ppm"
+//                    result_viewer.text = ppm.toString() + " ppm"
+                    result_viewer.speedTo(ppm)
                     if (ppm < minVal!!){
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_redview)
                         connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
@@ -364,6 +441,50 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * TB sensor check
+     */
+    fun tbSensorCheck(type : String): Boolean{
+        val command = byteArrayOfInt(0xD1)
+        val serialCommunication = SerialCommunication(manager, 0, 9600, 8, 1, 0)
+        val result = serialCommunication.write(command)
+        if (!result.equals(type)){
+            return false
+        }
+        return true
+
+    }
+
+    /**
+     * sensor type getter
+     */
+    fun getSensorType() : String {
+        when(App.prefs.sensor){
+            resources.getStringArray(R.array.sensor_lists)[0] -> {
+                return resources.getStringArray(R.array.sensor_type)[0]
+            }
+            resources.getStringArray(R.array.sensor_lists)[1] -> {
+                return resources.getStringArray(R.array.sensor_type)[1]
+            }
+            resources.getStringArray(R.array.sensor_lists)[2] -> {
+                return resources.getStringArray(R.array.sensor_type)[2]
+            }
+            resources.getStringArray(R.array.sensor_lists)[3] -> {
+                return resources.getStringArray(R.array.sensor_type)[3]
+            }
+            resources.getStringArray(R.array.sensor_lists)[4] -> {
+                return resources.getStringArray(R.array.sensor_type)[4]
+            }
+            resources.getStringArray(R.array.sensor_lists)[5] -> {
+                return resources.getStringArray(R.array.sensor_type)[5]
+            }
+            resources.getStringArray(R.array.sensor_lists)[6] -> {
+                return resources.getStringArray(R.array.sensor_type)[6]
+            }
+        }
+        return ""
     }
 
     /**
@@ -393,11 +514,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun ringOn(){
-        App.ringtone.run {
-            if(!isPlaying) play()
+        Log.d("MainActivity", "Ring on")
+        Log.d("MainActivity", defaultTime.toString())
+        Log.d("MainActivity", System.currentTimeMillis().toString())
+        if (System.currentTimeMillis() > defaultTime){
+            App.ringtone.run {
+                if(!isPlaying) play()
+            }
         }
     }
     fun ringOff(){
+        Log.d("MainActivity", "Ring off")
+        defaultTime = System.currentTimeMillis() + 600000
         App.ringtone.run {
             if(isPlaying) stop()
         }

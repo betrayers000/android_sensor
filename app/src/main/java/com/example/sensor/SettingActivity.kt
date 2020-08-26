@@ -80,41 +80,41 @@ class SettingActivity: AppCompatActivity() {
         sensor_spinner.setSelection(items3.indexOf(prefs.sensor))
 
 
-        sensor_btn1.setOnClickListener {
-            val intent = Intent(this, SensorDetailActivity::class.java)
-            intent.putExtra("sensor", resources.getString(R.string.o2))
-            startActivity(intent)
-        }
-
-        sensor_btn2.setOnClickListener {
-            val intent = Intent(this, SensorDetailActivity::class.java)
-            intent.putExtra("sensor", resources.getString(R.string.co2))
-            startActivity(intent)
-        }
-
-        sensor_btn3.setOnClickListener {
-            val intent = Intent(this, SensorDetailActivity::class.java)
-            intent.putExtra("sensor", resources.getString(R.string.co))
-            startActivity(intent)
-        }
-
-        sensor_btn4.setOnClickListener {
-            val intent = Intent(this, SensorDetailActivity::class.java)
-            intent.putExtra("sensor", resources.getString(R.string.no2))
-            startActivity(intent)
-        }
-
-        sensor_btn5.setOnClickListener {
-            val intent = Intent(this, SensorDetailActivity::class.java)
-            intent.putExtra("sensor", resources.getString(R.string.so2))
-            startActivity(intent)
-        }
-
-        sensor_btn6.setOnClickListener {
-            val intent = Intent(this, SensorDetailActivity::class.java)
-            intent.putExtra("sensor", resources.getString(R.string.h2s))
-            startActivity(intent)
-        }
+//        sensor_btn1.setOnClickListener {
+//            val intent = Intent(this, SensorDetailActivity::class.java)
+//            intent.putExtra("sensor", resources.getString(R.string.o2))
+//            startActivity(intent)
+//        }
+//
+//        sensor_btn2.setOnClickListener {
+//            val intent = Intent(this, SensorDetailActivity::class.java)
+//            intent.putExtra("sensor", resources.getString(R.string.co2))
+//            startActivity(intent)
+//        }
+//
+//        sensor_btn3.setOnClickListener {
+//            val intent = Intent(this, SensorDetailActivity::class.java)
+//            intent.putExtra("sensor", resources.getString(R.string.co))
+//            startActivity(intent)
+//        }
+//
+//        sensor_btn4.setOnClickListener {
+//            val intent = Intent(this, SensorDetailActivity::class.java)
+//            intent.putExtra("sensor", resources.getString(R.string.no2))
+//            startActivity(intent)
+//        }
+//
+//        sensor_btn5.setOnClickListener {
+//            val intent = Intent(this, SensorDetailActivity::class.java)
+//            intent.putExtra("sensor", resources.getString(R.string.so2))
+//            startActivity(intent)
+//        }
+//
+//        sensor_btn6.setOnClickListener {
+//            val intent = Intent(this, SensorDetailActivity::class.java)
+//            intent.putExtra("sensor", resources.getString(R.string.h2s))
+//            startActivity(intent)
+//        }
     }
 
 

@@ -91,6 +91,7 @@ class SerialCommunication(
         if (resultString.equals("sensor : ")){
             return null
         }
+        Log.d(SC_TAG, "Result Value : " + resultString)
         return resultString
 
     }
@@ -116,21 +117,24 @@ class SerialCommunication(
                                 val byteArray = buffer.copyOf(len)
 //                                val encode = String(byteArray, Charsets.US_ASCII)
 //                                resultString += encode
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[0].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[1].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[2].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[3].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[4].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[5].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[6].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[7].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[8].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[9].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[10].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[11].toString() )
-                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[12].toString() )
-                                resultString += (byteArray[6] * 256 + byteArray[7]).toString()
-                                Log.d(SC_TAG, "Write & Read START job result : " + resultString )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[0].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[1].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[2].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[3].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[4].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[5].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[6].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[7].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[8].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[9].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[10].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[11].toString() )
+//                                Log.d(SC_TAG, "Write & Read START job result : " + byteArray[12].toString() )
+                                if (command.size == 1){
+                                    resultString += byteArray[0].toString()
+                                } else {
+                                    resultString += (byteArray[6] * 256 + byteArray[7]).toString()
+                                }
                                 check = false
                             }
                         } catch (e: Exception){

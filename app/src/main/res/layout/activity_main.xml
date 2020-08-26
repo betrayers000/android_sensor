@@ -4,18 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/grey"
     tools:context=".MainActivity"
     android:id="@+id/main_background">
 
     <LinearLayout
+        android:paddingLeft="5sp"
+        android:paddingRight="5sp"
+        android:paddingTop="5sp"
+        android:layout_marginBottom="5sp"
         android:orientation="horizontal"
         android:id="@+id/main_measure_layout"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/main_btn_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.75">
+        app:layout_constraintHeight_percent="0.73">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,59 +34,80 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:text="@string/readyText"
-                android:textColor="#fafafa"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:id="@+id/result_viewer"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:autoSizeTextType="uniform"
-                android:textSize="60dp"
-                app:layout_constraintHeight_percent="0.4"
-                app:layout_constraintVertical_bias="0.2"
+<!--            <TextView-->
+<!--                android:text="@string/readyText"-->
+<!--                android:textColor="#fafafa"-->
+<!--                android:textStyle="bold"-->
+<!--                android:gravity="center"-->
+<!--                android:id="@+id/result_viewer"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0dp"-->
+<!--                android:autoSizeTextType="uniform"-->
+<!--                android:textSize="60dp"-->
+<!--                app:layout_constraintHeight_percent="0.4"-->
+<!--                app:layout_constraintVertical_bias="0.2"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                app:layout_constraintRight_toRightOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"/>-->
+            <LinearLayout
+                android:id="@+id/result_viewer_layout"
+                android:padding="10dp"
+                app:layout_constraintVertical_bias="0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.github.anastr.speedviewlib.SpeedView
+                    app:sv_withTremble="false"
+                    app:sv_speedTextColor="@color/white"
+                    app:sv_unitTextColor="@color/white"
+                    app:sv_speedTextSize="60sp"
+                    app:sv_unitTextSize="30sp"
+                    app:sv_textColor="@color/white"
+                    app:sv_textSize="15sp"
+                    android:id="@+id/result_viewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/result_viewer_tmp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_percent="0.2"
-                app:layout_constraintTop_toBottomOf="@+id/result_viewer"
+                app:layout_constraintTop_toBottomOf="@+id/result_viewer_layout"
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:text="temp"
                 android:autoSizeTextType="uniform"
                 android:textSize="20dp"
                 android:gravity="center"
                 android:textColor="#fafafa"/>
-            <TextView
-                android:id="@+id/result_viewer_min"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintHeight_percent="0.13"
-                app:layout_constraintTop_toBottomOf="@+id/result_viewer_tmp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                android:text="test"
-                android:textSize="30sp"
-                android:autoSizeTextType="uniform"
-                android:gravity="center"
-                android:textColor="#fafafa"/>
-            <TextView
-                android:id="@+id/result_viewer_max"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintHeight_percent="0.13"
-                app:layout_constraintTop_toBottomOf="@+id/result_viewer_min"
-                app:layout_constraintLeft_toLeftOf="parent"
-                android:text="test"
-                android:textSize="30sp"
-                android:autoSizeTextType="uniform"
-                android:gravity="center"
-                android:textColor="#fafafa"/>
+<!--            <TextView-->
+<!--                android:visibility="gone"-->
+<!--                android:id="@+id/result_viewer_min"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0dp"-->
+<!--                app:layout_constraintHeight_percent="0.13"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/result_viewer_tmp"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                android:textSize="30sp"-->
+<!--                android:autoSizeTextType="uniform"-->
+<!--                android:gravity="center"-->
+<!--                android:textColor="#fafafa"/>-->
+<!--            <TextView-->
+<!--                android:id="@+id/result_viewer_max"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0dp"-->
+<!--                app:layout_constraintHeight_percent="0.13"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/result_viewer_min"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                android:textSize="30sp"-->
+<!--                android:autoSizeTextType="uniform"-->
+<!--                android:gravity="center"-->
+<!--                android:textColor="#fafafa"/>-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -103,6 +128,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="9"/>
             <TextView
+                android:id="@+id/connect_msg"
                 android:text="@string/needConnectText"
                 android:textColor="#fafafa"
                 android:textStyle="bold"
@@ -117,6 +143,9 @@
     </LinearLayout>
 
     <LinearLayout
+        android:paddingLeft="5sp"
+        android:paddingRight="5sp"
+        android:paddingBottom="5sp"
         android:orientation="horizontal"
         android:id="@+id/main_btn_layout"
         app:layout_constraintTop_toBottomOf="@id/main_measure_layout"
@@ -125,6 +154,7 @@
         android:layout_height="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:background="@drawable/rectangle_white"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -167,9 +197,8 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_width="0dp"
-                app:layout_constraintWidth_percent="0.5"
-                android:layout_height="0dp"
-                app:layout_constraintHeight_percent="0.95"/>
+                app:layout_constraintWidth_percent="0.45"
+                android:layout_height="0dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
