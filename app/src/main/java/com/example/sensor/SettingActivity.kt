@@ -128,7 +128,7 @@ class SettingActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
             R.id.confirm_btn ->{
-                val confirmIntent = Intent(this, MainActivity::class.java)
+                val confirmIntent = Intent(this, Main2Activity::class.java)
 
                 // 액티비티가 전환되기전 sharedPreference에 값저장하기
 //                val danger_data = danger_spinner.selectedItem.toString()

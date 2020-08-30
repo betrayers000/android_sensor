@@ -15,7 +15,7 @@ class IntroActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_intro)
 
-        val mainIntent = Intent(this, MainActivity::class.java)
+        val mainIntent = Intent(this, Main2Activity::class.java)
         startActivity(mainIntent)
         finish()
     }
