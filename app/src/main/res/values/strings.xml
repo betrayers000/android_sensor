@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">sensor</string>
+    <string name="app_name">AllSensor</string>
 
 
     <string name="needConnectText">센서를 연결하세요. Connect the Sensor</string>
@@ -28,5 +28,8 @@
     <string name="alarm_no2">이산화질소 5ppm 초과\nNO₂ over 5ppm</string>
     <string name="alarm_so2">이산화황 5ppm 초과\nSO₂ over 5ppm</string>
     <string name="alarm_hcho">포름알데히드 0.1ppm 초과\nHCHO over 0.1ppm</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
