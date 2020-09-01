@@ -1,6 +1,8 @@
 package com.example.sensor
 
 import android.app.Application
+import android.content.IntentFilter
+import android.hardware.usb.UsbManager
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -10,9 +12,13 @@ class App:Application() {
         lateinit var prefs:SharedPreference
         lateinit var uriRingtone : Uri
         lateinit var ringtone : Ringtone
+
+        var resumed = false
+
     }
 
     override fun onCreate() {
+        super.onCreate()
         prefs = SharedPreference(applicationContext)
         val sound = prefs.sound
         var uriRingtone : Uri? = null
@@ -31,6 +37,6 @@ class App:Application() {
             }
         }
         ringtone = RingtoneManager.getRingtone(this, uriRingtone)
-        super.onCreate()
+
     }
 }
