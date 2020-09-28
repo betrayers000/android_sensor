@@ -1,4 +1,4 @@
-package com.example.sensor
+package com.example.sensor.main
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver

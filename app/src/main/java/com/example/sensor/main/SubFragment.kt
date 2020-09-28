@@ -1,0 +1,74 @@
+package com.example.sensor.main
+
+import android.content.Context
+import android.graphics.Color
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import com.example.sensor.App
+import com.example.sensor.R
+import com.github.anastr.speedviewlib.SpeedView
+import com.github.anastr.speedviewlib.components.Section
+import com.github.anastr.speedviewlib.components.Style
+import com.github.anastr.speedviewlib.components.indicators.Indicator
+import kotlinx.android.synthetic.main.activity_main2.*
+import kotlinx.android.synthetic.main.fragment_sub.*
+import java.util.*
+
+
+class SubFragment : Fragment() {
+    lateinit var activity : Main2Activity
+    lateinit var resultView : TextView
+    lateinit var resultSubView : TextView
+    lateinit var resultTitle : TextView
+
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        activity = getActivity() as Main2Activity
+        activity.main_btn_layout.visibility = View.VISIBLE
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_sub, container, false)
+
+        resultView = view.findViewById(R.id.connect_result)
+        resultSubView = view.findViewById(R.id.connect_sub_result)
+        resultTitle = view.findViewById(R.id.connect_title)
+
+        activity.setSensorParameter()
+        return view
+    }
+
+    fun setResultViewer(unit: String, measureMax: Float, minV : Float, maxV: Float){
+        setResultTitle(App.prefs.sensor)
+
+    }
+
+    fun setResult(value: String){
+        resultView.text= value
+    }
+
+    fun setResultSub(value: String){
+        resultSubView.text = value
+    }
+
+    fun setResultTitle(value: String){
+        resultTitle.text = value
+    }
+
+}
+

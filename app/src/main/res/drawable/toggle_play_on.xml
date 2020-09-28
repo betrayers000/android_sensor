@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item>
+        <shape android:shape="rectangle" >
+            <stroke
+                android:width="3dp"
+                android:color="@color/miniTitle" />
+
+            <corners
+                android:topRightRadius="50dp"
+                android:topLeftRadius="50dp"
+                android:bottomLeftRadius="50dp"
+                android:bottomRightRadius="50dp"/>
+        </shape>
+
+
+    </item>
+
+<!--    <item-->
+<!--        android:drawable="@drawable/baseline_play_arrow_24"-->
+<!--        android:scaleGravity="center"-->
+<!--        android:scaleHeight="50%"-->
+<!--        android:scaleWidth="50%">-->
+
+<!--    </item>-->
+
+</layer-list>

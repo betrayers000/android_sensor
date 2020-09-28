@@ -1,4 +1,4 @@
-package com.example.sensor
+package com.example.sensor.setting
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,12 +7,12 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.example.sensor.App.Companion.prefs
+import com.example.sensor.R
+import com.example.sensor.main.Main2Activity
 import kotlinx.android.synthetic.main.activity_setting2.*
-import kotlinx.android.synthetic.main.include_options.*
 import kotlinx.android.synthetic.main.include_options.sound_spinner
 
 class SettingActivity: AppCompatActivity() {
@@ -25,6 +25,10 @@ class SettingActivity: AppCompatActivity() {
 
         // 만든 array가져오기
         val items = resources.getStringArray(R.array.density)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         //어댑터 연결하기
 //        val myAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items)

@@ -1,4 +1,4 @@
-package com.example.sensor
+package com.example.sensor.detail
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,14 +8,11 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.Switch
 import com.example.sensor.App.Companion.prefs
+import com.example.sensor.R
+import com.example.sensor.setting.SettingActivity
 import com.suke.widget.SwitchButton
 import kotlinx.android.synthetic.main.activity_sensor_detail.*
-import kotlinx.android.synthetic.main.activity_setting2.*
-import kotlinx.android.synthetic.main.include_options.*
-import kotlinx.android.synthetic.main.include_options.sound_spinner
 
 class SensorDetailActivity : AppCompatActivity() {
 
