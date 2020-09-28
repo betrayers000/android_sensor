@@ -16,6 +16,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.anastr.speedviewlib.components.Section
 import com.github.anastr.speedviewlib.components.Style
 import com.github.anastr.speedviewlib.components.indicators.Indicator
@@ -29,6 +30,7 @@ class Main2Activity : AppCompatActivity() {
 
     lateinit var mainFragment: MainFragment
     lateinit var subFragment: SubFragment
+    lateinit var errorFragment: ErrorFragment
     private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     private val MAX_OPER = "> "
     private val MIN_OPER = "< "
@@ -43,6 +45,7 @@ class Main2Activity : AppCompatActivity() {
     var measureMax : Float? = null
     var unit : String = "ppm"
     private var defaultTime : Long = 1597932005417
+    val filter = IntentFilter(ACTION_USB_PERMISSION)
 
     @ExperimentalUnsignedTypes
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,25 +59,15 @@ class Main2Activity : AppCompatActivity() {
             actionBar.title = App.prefs.sensor
         }
 
-        mainFragment = MainFragment()
-        subFragment = SubFragment()
 
-        onFragmentChange(1)
-
-
-
-        val filter = IntentFilter(ACTION_USB_PERMISSION)
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
-        registerReceiver(usbReceiver, filter)
 
-        manager = getSystemService(Context.USB_SERVICE) as UsbManager
-        val deviceList : HashMap<String, UsbDevice> = manager.deviceList
-        deviceList.values.forEach { d ->
-            val permissionIntent =
-                PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
-            manager.requestPermission(d, permissionIntent)
-        }
+        mainFragment = MainFragment()
+        subFragment = SubFragment()
+        errorFragment = ErrorFragment()
+
+        onFragmentChange(1)
 
 //        setSensorParameter()
 
@@ -87,6 +80,7 @@ class Main2Activity : AppCompatActivity() {
                     loopChk = true
                     thread.start()
                 } else {
+                    loopChk = false
                     ringOff()
                 }
             }
@@ -94,6 +88,15 @@ class Main2Activity : AppCompatActivity() {
 
     }
 
+    fun initManager(){
+        manager = getSystemService(Context.USB_SERVICE) as UsbManager
+        val deviceList : HashMap<String, UsbDevice> = manager.deviceList
+        deviceList.values.forEach { d ->
+            val permissionIntent =
+                PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
+            manager.requestPermission(d, permissionIntent)
+        }
+    }
 
     /**
      * 결과창 각 센서에 맞게 셋팅하는 과정
@@ -160,56 +163,13 @@ class Main2Activity : AppCompatActivity() {
             supportFragmentManager.beginTransaction().replace(R.id.result_viewer_frame, mainFragment).commitAllowingStateLoss()
         } else if (fragmentNum == 2){
             supportFragmentManager.beginTransaction().replace(R.id.result_viewer_frame, subFragment).commitAllowingStateLoss()
+        } else if (fragmentNum == 3){
+            supportFragmentManager.beginTransaction().replace(R.id.result_viewer_frame, errorFragment).commitAllowingStateLoss()
         }
     }
 
     fun onFragmentMainText(msg : String){
         mainFragment.setText(msg)
-    }
-
-
-    /**
-     *  usb 연결 / 연결해제시 실행되는 작업
-     */
-    @ExperimentalUnsignedTypes
-    private val usbReceiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            // 연결됐을 때
-            if (ACTION_USB_PERMISSION == intent.action) {
-                synchronized(this) {
-                    val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        device?.apply {
-
-                            if (tbSensorCheck(getSensorType())){
-                                onFragmentChange(2)
-                                connect = true
-                            } else {
-                                onFragmentMainText(resources.getString(R.string.needCorrectText))
-                            }
-                        }
-                    } else {
-                        // 권한 허용이 안되어있는 경우
-                        Log.d("device", "permission denied for device $device")
-                    }
-
-                }
-            }
-            // 연결이 끊겼을때
-            if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
-                val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-                device?.apply {
-                    Log.d("Main connect", "Disconnect")
-                    onFragmentChange(1)
-                    connect = false
-                    loopChk = false
-                    measure_toggle_btn.isChecked = false
-
-                }
-            }
-        }
     }
 
     /**
@@ -485,4 +445,72 @@ class Main2Activity : AppCompatActivity() {
             if(isPlaying) stop()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        App.resumed = true
+
+        registerReceiver(usbReceiver, filter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        App.resumed = false
+        unregisterReceiver(usbReceiver)
+    }
+
+    /**
+     *  usb 연결 / 연결해제시 실행되는 작업
+     */
+    private val usbReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            // 연결됐을 때
+            Log.d("MAinActivity", intent.action.toString())
+            if (ACTION_USB_PERMISSION == intent.action || UsbManager.ACTION_USB_DEVICE_ATTACHED == intent.action) {
+                synchronized(this) {
+                    Log.d("MainActivity", "connect")
+                    val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
+
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        device?.apply {
+                            Log.d("MainActivity", "connect device")
+                            Log.d("MainActivity", tbSensorCheck(getSensorType()).toString())
+                            if (tbSensorCheck(getSensorType())){
+                                onFragmentChange(2)
+                                connect = true
+                            } else {
+                                onFragmentMainText(resources.getString(R.string.needCorrectText))
+                            }
+                        }
+                    } else {
+                        // 권한 허용이 안되어있는 경우
+                        Log.d("MainActivity", "permission denied for device $device")
+                        initManager()
+                    }
+
+                }
+            }
+            // 연결이 끊겼을때
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
+                ringOff()
+                Log.d("Main connect", "Disconnect")
+                onFragmentChange(1)
+                connect = false
+                loopChk = false
+                measure_toggle_btn.isChecked = false
+//                val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
+//                device?.apply {
+//                    ringOff()
+//                    Log.d("Main connect", "Disconnect")
+//                    onFragmentChange(1)
+//                    connect = false
+//                    loopChk = false
+//                    measure_toggle_btn.isChecked = false
+//                }
+            }
+        }
+    }
+
+
 }

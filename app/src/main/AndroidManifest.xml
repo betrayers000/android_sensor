@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.sensor">
-
-    <uses-feature android:name="android.hardware.usb.host" />
-
     <uses-permission android:name="com.google.android.things.permission.USE_PERIPHERAL_IO" />
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -15,17 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Main2Activity">
-            <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
+<!--            </intent-filter>-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />-->
+<!--            </intent-filter>-->
 
-            <meta-data
-                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
-            <meta-data
-                android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"
-                android:resource="@xml/device_filter" />
+<!--            <meta-data-->
+<!--                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
+<!--                android:resource="@xml/device_filter" />-->
+<!--            <meta-data-->
+<!--                android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"-->
+<!--                android:resource="@xml/device_filter" />-->
         </activity>
         <activity android:name=".IntroActivity">
             <intent-filter>
@@ -37,17 +36,6 @@
         <activity android:name=".SensorDetailActivity" />
         <activity android:name=".ConnectingActivity" />
         <activity android:name=".MainActivity">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
-<!--                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />-->
-<!--            </intent-filter>-->
-
-<!--            <meta-data-->
-<!--                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
-<!--                android:resource="@xml/device_filter" />-->
-<!--            <meta-data-->
-<!--                android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"-->
-<!--                android:resource="@xml/device_filter" />-->
         </activity>
         <activity android:name=".SettingActivity" />
     </application>
