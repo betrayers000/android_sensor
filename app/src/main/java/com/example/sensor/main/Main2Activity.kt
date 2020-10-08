@@ -302,8 +302,10 @@ class Main2Activity : AppCompatActivity() {
 
                     try{
                         val co2val = sensorVal.toFloat() * 10
-                        subFragment.setResult(co2val.toString() + unit)
-                        subFragment.setResultSub((co2val/10000).toString() + " %")
+                        subFragment.setResult(co2val.toString())
+//                        subFragment.setResultSub((co2val/10000).toString() + " %")
+                        subFragment.setUnit(unit)
+
 //                        result_viewer.speedTo(co2val)
 //                        result_viewer_tmp.text = (co2val/10000).toString() + " %"
                         Log.d("MainActivity", maxVal.toString())
@@ -352,7 +354,10 @@ class Main2Activity : AppCompatActivity() {
 
                     // 산소농도 값 넣기
 //                    result_viewer.text = oxygen.toString() + " %"
-                    subFragment.setResult(oxygen.toString() + unit)
+                    subFragment.setResult(oxygen.toString())
+                    subFragment.setUnit(unit)
+                    subFragment.setResultSub(temp)
+
                     // 산소농도에 따라 배경화면 색이 변함
                     if (oxygen < minVal!!){
 //                        connect_layout.setBackgroundColor(ContextCompat.getColor(context, R.color.customRed))
@@ -367,9 +372,6 @@ class Main2Activity : AppCompatActivity() {
 //                        connect_layout.background = resources.getDrawable(R.drawable.rectangled_greenview)
                     }
 
-                    // 온도 값 넣기
-//                    result_viewer_tmp.text = temp.toString()
-                    subFragment.setResultSub(temp)
                 }
             }
         }
@@ -415,14 +417,15 @@ class Main2Activity : AppCompatActivity() {
 //                    result_viewer.text = ppm.toString() + " ppm"
 //                    result_viewer.speedTo(ppb)
                 try {
-                    subFragment.setResult(result.toString() + unit)
-                    var percent : Double = 0.0
-                    if (unit == "ppm"){
-                        percent = result/10000
-                    } else {
-                        percent = result/10000000
-                    }
-                    subFragment.setResultSub(((percent*1000).roundToInt()/1000f).toString() + "%")
+                    subFragment.setResult(result.toString())
+//                    var percent : Double = 0.0
+//                    if (unit == "ppm"){
+//                        percent = result/10000
+//                    } else {
+//                        percent = result/10000000
+//                    }
+//                    subFragment.setResultSub(((percent*1000).roundToInt()/1000f).toString() + "%")
+                    subFragment.setUnit(unit)
                 } catch (e : Exception){
 
                 }
@@ -538,7 +541,6 @@ class Main2Activity : AppCompatActivity() {
                     unit = result.get("unit").toString()
                     type = result.get("type").toString().toInt()
                     decimal = result.get("decimal").toString().toInt()
-
                 } catch (e: Exception){
                     onFragmentChange(3)
                     println(e)

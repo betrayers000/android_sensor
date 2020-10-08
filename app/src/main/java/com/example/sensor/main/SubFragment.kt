@@ -24,6 +24,7 @@ class SubFragment : Fragment() {
     lateinit var resultView : TextView
     lateinit var resultSubView : TextView
     lateinit var resultTitle : TextView
+    lateinit var unitView : TextView
 
 
     override fun onAttach(context: Context?) {
@@ -48,6 +49,8 @@ class SubFragment : Fragment() {
         resultView = view.findViewById(R.id.connect_result)
         resultSubView = view.findViewById(R.id.connect_sub_result)
         resultTitle = view.findViewById(R.id.connect_title)
+        unitView = view.findViewById(R.id.unit_view)
+
 
         activity.setSensorParameter()
         return view
@@ -68,6 +71,10 @@ class SubFragment : Fragment() {
 
     fun setResultTitle(value: String){
         resultTitle.text = value
+    }
+
+    fun setUnit(value : String){
+        unitView.text = value
     }
 
 }
