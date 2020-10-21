@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import com.example.sensor.App
 import com.example.sensor.R
@@ -25,6 +26,7 @@ class SubFragment : Fragment() {
     lateinit var resultSubView : TextView
     lateinit var resultTitle : TextView
     lateinit var unitView : TextView
+    lateinit var backgroundLayout : FrameLayout
 
 
     override fun onAttach(context: Context?) {
@@ -50,9 +52,18 @@ class SubFragment : Fragment() {
         resultSubView = view.findViewById(R.id.connect_sub_result)
         resultTitle = view.findViewById(R.id.connect_title)
         unitView = view.findViewById(R.id.unit_view)
+        backgroundLayout = view.findViewById(R.id.fragment_sub_background_layout)
 
 
         activity.setSensorParameter()
+
+
+        // resultView Click
+        resultView.setOnClickListener {
+            if (resultView.text == resources.getText(R.string.startText)){
+                activity.startMeasure()
+            }
+        }
         return view
     }
 
@@ -75,6 +86,16 @@ class SubFragment : Fragment() {
 
     fun setUnit(value : String){
         unitView.text = value
+    }
+
+    fun changeBackground(check : Boolean){
+        if (check){
+            backgroundLayout.setBackgroundColor(resources.getColor(R.color.contentBodyColor))
+        }
+        else {
+            backgroundLayout.setBackgroundColor(resources.getColor(R.color.customRed))
+
+        }
     }
 
 }

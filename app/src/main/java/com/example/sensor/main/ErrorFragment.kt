@@ -5,7 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import com.example.sensor.App
 import com.example.sensor.R
+import kotlinx.android.synthetic.main.activity_main2.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,13 +24,14 @@ class ErrorFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    lateinit var activity : Main2Activity
+    lateinit var errorMainTextView : TextView
+    lateinit var errorSubTextView : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        activity = getActivity() as Main2Activity
+        activity.main_btn_layout.visibility = View.GONE
     }
 
     override fun onCreateView(
@@ -35,7 +39,13 @@ class ErrorFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_error, container, false)
+
+        val view = inflater.inflate(R.layout.fragment_error, container, false)
+
+        errorMainTextView = view.findViewById(R.id.fragment_error_main_text)
+
+        errorMainTextView.text = App.prefs.sensor
+        return view
     }
 
     companion object {
@@ -57,4 +67,5 @@ class ErrorFragment : Fragment() {
                 }
             }
     }
+
 }

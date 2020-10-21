@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/contentBodyColor"
+    android:id="@+id/fragment_sub_background_layout"
     android:padding="10dp"
     tools:context=".main.SubFragment">
 
@@ -50,7 +51,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/connect_result"
-                    android:text="Ready"
+                    android:text="@string/startText"
                     android:textSize="90sp"
                     android:textColor="@color/miniTitle"
                     android:layout_width="wrap_content"
