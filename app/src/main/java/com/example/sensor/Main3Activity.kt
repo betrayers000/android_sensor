@@ -15,34 +15,19 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-=======
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/Main2Activity.kt
-import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.github.anastr.speedviewlib.components.Section
-import com.github.anastr.speedviewlib.components.Style
-import com.github.anastr.speedviewlib.components.indicators.Indicator
-=======
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
 import androidx.appcompat.widget.Toolbar
 import com.example.sensor.*
+import com.example.sensor.data.SensorData
 import com.example.sensor.utils.SerialCommunication
 import com.example.sensor.setting.SettingActivity
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-=======
 import com.example.sensor.utils.SensorInit
 import com.example.sensor.utils.SerialCommunication2
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
+import com.example.sensor.utils.TBSensorStrategy
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-=======
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/main/Main2Activity.kt
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main2.*
 import java.lang.Exception
@@ -50,7 +35,7 @@ import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 import kotlin.time.toDuration
 
-class Main2Activity : AppCompatActivity() {
+class Main3Activity : AppCompatActivity() {
 
     // Fragment List
     lateinit var mainFragment: MainFragment
@@ -64,7 +49,7 @@ class Main2Activity : AppCompatActivity() {
     lateinit var manager : UsbManager
     var connect = false
     var loopChk = true
-    lateinit var scManager: SerialCommunication
+    lateinit var scManager: SerialCommunication2
     private val SENSOR_MESSAGE = "sensorMessage"
 
     // Measure Thread
@@ -206,56 +191,12 @@ class Main2Activity : AppCompatActivity() {
     }
 
     /**
-     * 결과창 각 센서에 맞게 셋팅하는 과정
+     * fragment Change Function
+     * 1 : main
+     * 2 : measure page
+     * 3 : error page
      */
-    fun setSensorParameter(){
-        when(App.prefs.sensor){
-            resources.getStringArray(R.array.sensor_lists)[0] -> {
-                minVal = App.prefs.min_o2
-                maxVal = App.prefs.max_o2
-                measureMax = 25.0f
-            }
-            resources.getStringArray(R.array.sensor_lists)[1] -> {
-                minVal = App.prefs.min_co2
-                maxVal = 30000f
-                measureMax = 200000f
-            }
-            resources.getStringArray(R.array.sensor_lists)[2] -> {
-                minVal = App.prefs.min_co
-                maxVal = App.prefs.max_co
-                measureMax = 1000.0f
-            }
-            resources.getStringArray(R.array.sensor_lists)[3] -> {
-                minVal = App.prefs.min_no2
-                maxVal = App.prefs.max_no2
-                measureMax = 100.0f
-            }
-            resources.getStringArray(R.array.sensor_lists)[4] -> {
-                minVal = App.prefs.min_so2
-                maxVal = App.prefs.max_so2
-                measureMax = 100.0f
-            }
-            resources.getStringArray(R.array.sensor_lists)[5] -> {
-                minVal = App.prefs.min_h2s
-                maxVal = App.prefs.max_h2s
-                measureMax = 100.0f
-            }
-            resources.getStringArray(R.array.sensor_lists)[6] -> {
-                minVal = App.prefs.min_hcho
-                maxVal = App.prefs.max_hcho
-                measureMax = 1000.0f
-            }
-        }
-        val minV = minVal!!/measureMax!!
-        val maxV = maxVal!!/measureMax!!
-        subFragment.setResultViewer(unit, measureMax!!, minV, maxV)
-
-    }
-
     fun onFragmentChange(fragmentNum : Int){
-        Log.d("MainActivity", unit)
-        Log.d("MainActivity", type.toString())
-        Log.d("MainActivity", decimal.toString())
         if (fragmentNum == 1){
             supportFragmentManager.beginTransaction().replace(R.id.result_viewer_frame, mainFragment).commitAllowingStateLoss()
         } else if (fragmentNum == 2){
@@ -270,28 +211,6 @@ class Main2Activity : AppCompatActivity() {
      */
     fun byteArrayOfInt(vararg ints : Int) = ByteArray(ints.size) {pos -> ints[pos].toByte()}
 
-    /**
-     * TB sensor check
-     */
-    @ExperimentalUnsignedTypes
-    fun tbSensorCheck(type : String): Boolean{
-        val command = byteArrayOfInt(0xD1)
-        val serialCommunication =
-            SerialCommunication(
-                manager,
-                0,
-                9600,
-                8,
-                1,
-                0
-            )
-        val result = serialCommunication.write(command)
-        if (!result.equals(type)){
-            return false
-        }
-        return true
-
-    }
 
     /**
      * sensor type getter
@@ -384,8 +303,7 @@ class Main2Activity : AppCompatActivity() {
     fun co2Sensor(){
         var msg : String? = ""
         while(loopChk){
-            msg = scManager.SCRead() // Z xxxxx
-
+            scManager.Read(30) // Z xxxxx
             if (msg != null) {
                 val sensorVal = msg.split(" ")[2]
                 runOnUiThread {
@@ -420,27 +338,21 @@ class Main2Activity : AppCompatActivity() {
      * 산소 센서 측정
      */
     fun o2Sensor(){
-        var msg : String? = ""
         var cnt = 0
         while(loopChk){
             cnt += 1
-            msg = scManager.SCRead()
-            if (msg != null) {
-                val hashMap = getMap(msg)
-                val oxygen = hashMap.get("%")!!.toFloat()
-                // 온도
-                val temp = hashMap.get("T") + " °C"
+            scManager.Read(32)
+            if (SensorData.measureValue != null) {
                 runOnUiThread {
-                    subFragment.setResult(oxygen.toString())
-                    subFragment.setUnit(unit)
-                    subFragment.setResultSub(temp)
-                    addEntry(oxygen.toFloat())
+                    subFragment.setResult(SensorData.measureValue.toString())
+                    subFragment.setUnit(SensorData.unit.toString())
+                    subFragment.setResultSub(SensorData.subValue.toString())
 
                     // 산소농도에 따라 배경화면 색이 변함
-                    if (oxygen < minVal!!){
+                    if (SensorData.measureValue!! < minVal!!){
                         subFragment.changeBackground(false)
                         ringOn()
-                    } else if (oxygen > maxVal!! ){
+                    } else if (SensorData.measureValue!! > maxVal!! ){
                         subFragment.changeBackground(false)
                         ringOn()
                     } else {
@@ -453,46 +365,21 @@ class Main2Activity : AppCompatActivity() {
         }
     }
 
-
-    /**
-     * 산소측정 센서 각 수치별로 나눠주는 함수
-     */
-    fun getMap(msg : String?) : MutableMap<String, String>{
-        val checkList = listOf<String>("O", "P", "e", "%", "T")
-        var checkString = "O"
-        val hashMap = mutableMapOf<String, String>("O" to "")
-        val msgArray = msg!!.split("")
-        for (i in 0 until msgArray.size-1) {
-            val n = msgArray[i]
-            if (n == " "){
-                continue
-            }
-            if (n in checkList){
-                checkString = n
-                hashMap.put(n, "")
-                continue
-            }
-            val temp = hashMap.get(checkString)
-            hashMap.put(checkString, temp + n)
-        }
-        return hashMap
-    }
-
     /**
      * TB 센서 함수
      */
     @ExperimentalUnsignedTypes
     fun tbSensor(){
+        val tbSensorStrategy = TBSensorStrategy()
+        scManager.setReadStrategy(tbSensorStrategy)
         while(loopChk){
-            val res = scManager.readTbSensor()
-            val measureVal = res.toFloat()
-            val result = measureVal/(Math.pow(10.toDouble(), decimal.toDouble()))
-            Log.d("MainActivty", res + " and " + measureVal + " and " + result + " decimal : " + decimal)
+            scManager.Read(32)
+            val result = SensorData.measureValue!!/(Math.pow(10.toDouble(), SensorData.decimal!!.toDouble()))
             runOnUiThread {
                 // 가스 농도 값 넣기
                 try {
                     subFragment.setResult(result.toString())
-                    subFragment.setUnit(unit)
+                    subFragment.setUnit(SensorData.unit.toString())
                     addEntry(result.toFloat())
                 } catch (e : Exception){
 
@@ -576,39 +463,19 @@ class Main2Activity : AppCompatActivity() {
 
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         device?.apply {
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-=======
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/Main2Activity.kt
-                            Log.d("MainActivity", "connect device")
-                            Log.d("MainActivity", tbSensorCheck(getSensorType()).toString())
-                            if (tbSensorCheck(getSensorType())){
-                                onFragmentChange(2)
-                                connect = true
-                            } else {
-                                onFragmentMainText(resources.getString(R.string.needCorrectText))
-                            }
-=======
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
-                            scManager = SerialCommunication(
+                            scManager = SerialCommunication2(
                                 manager,
                                 0,
                                 9600,
                                 8,
                                 1,
                                 0)
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-=======
 
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
                             val pendingResult = goAsync()
                             val asyncTask = Task(pendingResult, intent)
                             asyncTask.execute()
                             connect = true
 
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-=======
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/main/Main2Activity.kt
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
                         }
                     } else {
                         // 권한 허용이 안되어있는 경우
@@ -625,21 +492,6 @@ class Main2Activity : AppCompatActivity() {
                 onFragmentChange(1)
                 connect = false
                 loopChk = false
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/main/Main2Activity.kt
-//                measure_toggle_btn.isChecked = false
-=======
-<<<<<<< Updated upstream:app/src/main/java/com/example/sensor/Main2Activity.kt
-                measure_toggle_btn.isChecked = false
-//                val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-//                device?.apply {
-//                    ringOff()
-//                    Log.d("Main connect", "Disconnect")
-//                    onFragmentChange(1)
-//                    connect = false
-//                    loopChk = false
-//                    measure_toggle_btn.isChecked = false
-//                }
-=======
 //                measure_toggle_btn.isChecked = false
             }
         }
@@ -653,53 +505,13 @@ class Main2Activity : AppCompatActivity() {
                  * TBSensor 기준으로 작성
                  * Co2, O2 센서는 확인해봐야 함 -> 아직 미체크
                  */
-                val result = scManager.InitTbSensor()
-                try {
-
-                    unit = result.get("unit").toString()
-                    type = result.get("type").toString().toInt()
-                    decimal = result.get("decimal").toString().toInt()
-                } catch (e: Exception){
-                    onFragmentChange(3)
-                    println(e)
-                }
-                if (type.toString().equals(getSensorType())){
+                val sensorInit = SensorInit()
+                scManager.setReadStrategy(sensorInit)
+                scManager.Read(9)
+                if (SensorData.type.toString().equals(getSensorType())){
                     onFragmentChange(2)
-                }
-                return toString().also{
-                    log-> Log.d("MainActivty", log)
-                }
-            }
-
-            override fun onPostExecute(result: String?) {
-                super.onPostExecute(result)
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/main/Main2Activity.kt
->>>>>>> Stashed changes:app/src/main/java/com/example/sensor/Main2Activity.kt
-            }
-        }
-        private inner class Task(
-            private val pedndingResult: PendingResult,
-            private val intent : Intent
-        ): AsyncTask<String, Int, String>(){
-            override fun doInBackground(vararg params: String?): String {
-                /**
-                 * Sensor Type check
-                 * TBSensor 기준으로 작성
-                 * Co2, O2 센서는 확인해봐야 함 -> 아직 미체크
-                 */
-                val result = scManager.InitTbSensor()
-                try {
-
-                    unit = result.get("unit").toString()
-                    type = result.get("type").toString().toInt()
-                    decimal = result.get("decimal").toString().toInt()
-                } catch (e: Exception){
+                } else {
                     onFragmentChange(3)
-                    println(e)
-                }
-
-                if (type.toString().equals(getSensorType())){
-                    onFragmentChange(2)
                 }
                 return toString().also{
                     log-> Log.d("MainActivty", log)

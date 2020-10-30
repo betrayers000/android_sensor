@@ -32,7 +32,7 @@ class SerialCommunication(
         this.SCOpenDevice()
     }
 
-    fun SCFindDevice(){
+    private fun SCFindDevice(){
         driverList = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
         if (driverList.isEmpty()){
             return
@@ -41,7 +41,7 @@ class SerialCommunication(
         connection = manager.openDevice(driver.device)
     }
 
-    fun SCOpenDevice(){
+    private fun SCOpenDevice(){
         if (driverList.isEmpty()){
             return
         }
