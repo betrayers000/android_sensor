@@ -49,7 +49,7 @@ class Main2Activity : AppCompatActivity() {
     private val SENSOR_MESSAGE = "sensorMessage"
 
     // Measure Thread
-    val thread = ThreadClass()
+    lateinit var thread : ThreadClass
 
     // Connected Sensor Setting
     var minVal : Float? = null
@@ -354,6 +354,11 @@ class Main2Activity : AppCompatActivity() {
                     tbSensor()
                 }
             }
+            runOnUiThread {
+
+                subFragment.setResult(resources.getString(R.string.startText))
+                subFragment.setUnit("")
+            }
 
         }
     }
@@ -380,13 +385,13 @@ class Main2Activity : AppCompatActivity() {
 
                         Log.d("MainActivity", maxVal.toString())
                         if (sensorVal.toFloat() < minVal!!){
-                            subFragment.changeBackground(false)
+                            changeBack(false)
                             ringOn()
                         } else if (sensorVal.toFloat() > maxVal!! ){
-                            subFragment.changeBackground(false)
+                            changeBack(false)
                             ringOn()
                         } else {
-                            subFragment.changeBackground(true)
+                            changeBack(true)
                             ringOff(0)
                         }
                     } catch (e : Exception){
@@ -419,13 +424,13 @@ class Main2Activity : AppCompatActivity() {
 
                     // 산소농도에 따라 배경화면 색이 변함
                     if (oxygen < minVal!!){
-                        subFragment.changeBackground(false)
+                        changeBack(false)
                         ringOn()
                     } else if (oxygen > maxVal!! ){
-                        subFragment.changeBackground(false)
+                        changeBack(false)
                         ringOn()
                     } else {
-                        subFragment.changeBackground(true)
+                        changeBack(true)
                         ringOff(0)
                     }
 
@@ -474,18 +479,18 @@ class Main2Activity : AppCompatActivity() {
                 try {
                     subFragment.setResult(result.toString())
                     subFragment.setUnit(unit)
-                    addEntry(result.toFloat())
+//                    addEntry(result.toFloat())
                 } catch (e : Exception){
 
                 }
                 if (result < minVal!!){
-                    subFragment.changeBackground(false)
+                    changeBack(false)
                     ringOn()
                 } else if (result > maxVal!! ){
-                    subFragment.changeBackground(false)
+                    changeBack(false)
                     ringOn()
                 } else {
-                    subFragment.changeBackground(true)
+                    changeBack(true)
                     ringOff(0)
                 }
             }
@@ -611,6 +616,8 @@ class Main2Activity : AppCompatActivity() {
 
                 if (type.toString().equals(getSensorType())){
                     onFragmentChange(2)
+                } else{
+                    onFragmentChange(3)
                 }
                 return toString().also{
                     log-> Log.d("MainActivty", log)
@@ -624,13 +631,24 @@ class Main2Activity : AppCompatActivity() {
     }
 
     fun startMeasure(){
+        thread = ThreadClass()
         thread.start()
+
     }
 
     fun stopMeasure(){
         ringOff(1)
         connect = false
         loopChk = false
+    }
+
+    private fun changeBack(value: Boolean){
+        try{
+            subFragment.changeBackground(value)
+        } catch(e: Exception){
+
+        }
+
     }
 
 }

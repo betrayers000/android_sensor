@@ -128,7 +128,13 @@ class SerialCommunication(
 //        Log.d(SC_TAG, "Write Communication Sensor")
         runBlocking {
             val job = launch(Dispatchers.IO) {
-                port.write(command, 1000)
+                try {
+
+                    port.write(command, 1000)
+                } catch (e: Exception){
+
+                }
+
             }
             job.join()
             delay(800)
@@ -224,7 +230,12 @@ class SerialCommunication(
         runBlocking {
             Log.d(SC_TAG, "Write & Read START job")
             val job = launch(Dispatchers.IO) {
-                port.write(command, 1000)
+                try {
+                    port.write(command, 1000)
+                } catch (e : Exception){
+
+                }
+
                 var cnt = 0
                 var check = true
                 while (check) {
