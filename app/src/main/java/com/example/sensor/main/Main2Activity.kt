@@ -375,13 +375,11 @@ class Main2Activity : AppCompatActivity() {
             if (msg != null) {
                 val sensorVal = msg.split(" ")[2]
                 runOnUiThread {
-                    // 산소농도 값 넣기
 
                     try{
                         val co2val = sensorVal.toFloat() * 10
                         subFragment.setResult(co2val.toString())
                         subFragment.setUnit(unit)
-                        addEntry(co2val)
 
                         Log.d("MainActivity", maxVal.toString())
                         if (sensorVal.toFloat() < minVal!!){
@@ -420,7 +418,6 @@ class Main2Activity : AppCompatActivity() {
                     subFragment.setResult(oxygen.toString())
                     subFragment.setUnit(unit)
                     subFragment.setResultSub(temp)
-                    addEntry(oxygen.toFloat())
 
                     // 산소농도에 따라 배경화면 색이 변함
                     if (oxygen < minVal!!){
@@ -631,6 +628,7 @@ class Main2Activity : AppCompatActivity() {
     }
 
     fun startMeasure(){
+        loopChk = true
         thread = ThreadClass()
         thread.start()
 
