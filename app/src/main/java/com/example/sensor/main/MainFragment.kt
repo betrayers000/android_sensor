@@ -1,4 +1,4 @@
-package com.example.sensor
+package com.example.sensor.main
 
 import android.content.Context
 import android.os.Bundle
@@ -6,6 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import com.example.sensor.App
+import com.example.sensor.R
+import kotlinx.android.synthetic.main.activity_main2.*
 import kotlinx.android.synthetic.main.fragment_main.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -28,6 +32,7 @@ class MainFragment : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         activity = getActivity() as Main2Activity
+        activity.main_btn_layout.visibility = View.GONE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +48,11 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        val view = inflater.inflate(R.layout.fragment_main, container, false)
+
+        val sensorView = view.findViewById<TextView>(R.id.fragment_main_connect_type)
+        sensorView.text = App.prefs.sensor
+        return view
     }
 
     fun setText(msg: String){

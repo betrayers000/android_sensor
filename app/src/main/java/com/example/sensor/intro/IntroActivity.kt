@@ -1,13 +1,10 @@
-package com.example.sensor
+package com.example.sensor.intro
 
 import android.content.Intent
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.github.anastr.speedviewlib.components.Section
-import com.github.anastr.speedviewlib.components.Style
-import com.github.anastr.speedviewlib.components.indicators.Indicator
-import kotlinx.android.synthetic.main.activity_intro.*
+import com.example.sensor.main.Main2Activity
+import com.example.sensor.R
 
 class IntroActivity : AppCompatActivity() {
 

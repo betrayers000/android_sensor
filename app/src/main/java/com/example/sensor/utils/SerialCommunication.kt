@@ -1,19 +1,15 @@
-package com.example.sensor
+package com.example.sensor.utils
 
-import android.content.Context
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.util.Log
 import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
-import com.hoho.android.usbserial.util.SerialInputOutputManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.nio.charset.Charset
-import java.util.concurrent.Executors
 
 class SerialCommunication(
     val manager: UsbManager,
@@ -58,6 +54,12 @@ class SerialCommunication(
         }
     }
 
+    /**
+     * Create ByteArray
+     */
+    fun byteArrayOfInt(vararg ints : Int) = ByteArray(ints.size) {pos -> ints[pos].toByte()}
+
+
     fun SCRead() : String?{
         Log.d(SC_TAG, "READ START")
 
@@ -96,6 +98,130 @@ class SerialCommunication(
 
     }
 
+    /**
+     * Serial Communication Read Function
+     * return is ByteArray
+     * 2020-09-28
+     */
+    private fun SCread() : ByteArray?{
+//        Log.d(SC_TAG, "READ START")
+
+        val buffer = ByteArray(64)
+        try {
+            val len = port.read(buffer, 1000)
+//            Log.d("readArr", len.toString())
+            if (len > 0) {
+                return buffer.copyOf(len)
+            }
+        } catch (e: Exception){
+
+        }
+        return null
+    }
+
+    /**
+     * Serial Communication Write Function
+     * require Sensor Command
+     * 2020-09-28
+     */
+    private fun SCWrite(command : ByteArray){
+//        Log.d(SC_TAG, "Write Communication Sensor")
+        runBlocking {
+            val job = launch(Dispatchers.IO) {
+                try {
+
+                    port.write(command, 1000)
+                } catch (e: Exception){
+
+                }
+
+            }
+            job.join()
+            delay(800)
+        }
+
+    }
+
+    /**
+     * TB Sensor init function
+     * command is 0xD1
+     * 2020-09-28
+     */
+    fun InitTbSensor() : HashMap<String, Any>{
+        Log.d(SC_TAG, "Init TB-Sensor")
+        SCWrite(byteArrayOfInt(0xD1))
+        val result = HashMap<String, Any>()
+        val readArr = ByteArray(9)
+        var idx = 0
+        var cnt = 0
+        while (true) {
+            val temp = SCread()
+            if (temp != null){
+                for (i in 0..temp.size-1) {
+                    if (idx > 8){
+                        break
+                    }
+//                    Log.d(SC_TAG, idx.toString() + "readArr Value : " + i + " : " + temp[i].toInt().toString())
+                    readArr.set(idx, temp[i])
+                    idx += 1
+                }
+            }
+            if (idx > 8){
+                break
+            }
+            if (cnt > 300){
+                break
+            }
+            cnt += 1
+        }
+        if (readArr[3].equals(0x02.toByte())) {
+            result.put("unit", "ppm")
+        }else {
+            result.put("unit", "ppb")
+        }
+        result.put("type", readArr[0].toInt())
+        result.put("decimal", readArr[7].toInt()/16)
+        Log.d("readArr", "return")
+        return result
+    }
+
+    /**
+     * TB Sensor Measure Function
+     * 2020-09-28
+     */
+    @ExperimentalUnsignedTypes
+    fun readTbSensor(): String{
+//        Log.d(SC_TAG, "Init TB-Sensor")
+        SCWrite(byteArrayOfInt(0xFF, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x78))
+        val readArr = ByteArray(12)
+        var idx = 0
+        var cnt = 0
+        while (true) {
+            val temp = SCread()
+            if (temp != null){
+                for (i in 0..temp.size-1) {
+                    if (idx > 10){
+                        break
+                    }
+//                    Log.d(SC_TAG, idx.toString() + "readArr Value : " + i + " : " + temp[i].toInt().toString())
+
+                    readArr.set(idx, temp[i])
+                    idx += 1
+                }
+            }
+            if (idx > 10){
+                break
+            }
+            cnt += 1
+            if (cnt > 300){
+                break
+            }
+        }
+        val result = (readArr[6].toUByte().toInt() * 256 + readArr[7].toUByte().toInt()).toString()
+        return result
+    }
+
+
 
     @ExperimentalUnsignedTypes
     fun write(command : ByteArray) : String?{
@@ -104,7 +230,12 @@ class SerialCommunication(
         runBlocking {
             Log.d(SC_TAG, "Write & Read START job")
             val job = launch(Dispatchers.IO) {
-                port.write(command, 1000)
+                try {
+                    port.write(command, 1000)
+                } catch (e : Exception){
+
+                }
+
                 var cnt = 0
                 var check = true
                 while (check) {
@@ -151,7 +282,6 @@ class SerialCommunication(
                 }
             }
             job.join()
-            delay(300)
         }
         return resultString
     }

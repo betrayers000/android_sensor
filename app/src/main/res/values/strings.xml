@@ -5,6 +5,10 @@
     <string name="needConnectText">센서를 연결하세요. Connect the Sensor</string>
     <string name="needCorrectText">설정에 맞는 센서를 연결하세요. Connect the Correct Sensor</string>
     <string name="readyText">READY</string>
+    <string name="startText">START</string>
+    <string name="measureStop">MeasureStop\n측정 정지</string>
+    <string name="alarmStop">AlarmStop\n알람 정지</string>
+
 
     <string name="o2">산소 O₂</string>
     <string name="co2">이산화탄소 CO₂</string>

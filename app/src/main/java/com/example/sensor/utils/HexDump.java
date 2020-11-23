@@ -1,4 +1,4 @@
-package com.example.sensor;
+package com.example.sensor.utils;
 
 /*
  * Copyright (C) 2006 The Android Open Source Project
