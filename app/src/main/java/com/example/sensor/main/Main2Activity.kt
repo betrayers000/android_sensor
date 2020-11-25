@@ -1,35 +1,33 @@
 package com.example.sensor.main
 
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Color
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.AsyncTask
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.example.sensor.*
-import com.example.sensor.utils.SerialCommunication
+import com.example.sensor.App
+import com.example.sensor.R
 import com.example.sensor.setting.SettingActivity
+import com.example.sensor.utils.SerialCommunication
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main2.*
-import java.lang.Exception
-import kotlin.collections.HashMap
-import kotlin.math.roundToInt
-import kotlin.time.toDuration
 
 class Main2Activity : AppCompatActivity() {
 
@@ -66,6 +64,9 @@ class Main2Activity : AppCompatActivity() {
     // Intent Filter
     val filter = IntentFilter(ACTION_USB_PERMISSION)
 
+    // alertdialog
+    lateinit var dialog : AlertDialog
+
     @ExperimentalUnsignedTypes
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,7 @@ class Main2Activity : AppCompatActivity() {
         mainFragment = MainFragment()
         subFragment = SubFragment()
         errorFragment = ErrorFragment()
+
 
         onFragmentChange(1)
         // button event
@@ -318,6 +320,8 @@ class Main2Activity : AppCompatActivity() {
             R.id.setting_btn -> {
                 val settingIntent = Intent(this, SettingActivity::class.java)
                 startActivity(settingIntent)
+                stopMeasure()
+                finish()
                 return true
             }
             else -> {
@@ -363,6 +367,21 @@ class Main2Activity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Measure Value set
+     *
+     */
+    private fun setMeasureValue(main : String, sub : String?){
+        subFragment.setResult(main)
+        subFragment.setUnit(unit)
+        if (sub != null){
+            subFragment.setResultSub(sub)
+        }
+        if (dialog.isShowing){
+            dialog.dismiss()
+        }
+
+    }
 
     /**
      * 이산환탄소 센서 측정
@@ -378,8 +397,9 @@ class Main2Activity : AppCompatActivity() {
 
                     try{
                         val co2val = sensorVal.toFloat() * 10
-                        subFragment.setResult(co2val.toString())
-                        subFragment.setUnit(unit)
+                        setMeasureValue(co2val.toString(), null)
+//                        subFragment.setResult(co2val.toString())
+//                        subFragment.setUnit(unit)
 
                         Log.d("MainActivity", maxVal.toString())
                         if (sensorVal.toFloat() < minVal!!){
@@ -415,9 +435,10 @@ class Main2Activity : AppCompatActivity() {
                 // 온도
                 val temp = hashMap.get("T") + " °C"
                 runOnUiThread {
-                    subFragment.setResult(oxygen.toString())
-                    subFragment.setUnit(unit)
-                    subFragment.setResultSub(temp)
+                    setMeasureValue(oxygen.toString(), temp)
+//                    subFragment.setResult(oxygen.toString())
+//                    subFragment.setUnit(unit)
+//                    subFragment.setResultSub(temp)
 
                     // 산소농도에 따라 배경화면 색이 변함
                     if (oxygen < minVal!!){
@@ -474,8 +495,9 @@ class Main2Activity : AppCompatActivity() {
             runOnUiThread {
                 // 가스 농도 값 넣기
                 try {
-                    subFragment.setResult(result.toString())
-                    subFragment.setUnit(unit)
+                    setMeasureValue(result.toString(), null)
+//                    subFragment.setResult(result.toString())
+//                    subFragment.setUnit(unit)
 //                    addEntry(result.toFloat())
                 } catch (e : Exception){
 
@@ -496,6 +518,7 @@ class Main2Activity : AppCompatActivity() {
         }
 
     }
+
 
     /**
      * alarm start 함수
@@ -533,14 +556,17 @@ class Main2Activity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        App.resumed = true
-
+        Log.d("Main", "onResume")
         registerReceiver(usbReceiver, filter)
+        if (App.resumed){
+            val intent = Intent(ACTION_USB_PERMISSION)
+            sendBroadcast(intent)
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        App.resumed = false
+        Log.d("Main", "onPause")
         unregisterReceiver(usbReceiver)
     }
 
@@ -551,6 +577,7 @@ class Main2Activity : AppCompatActivity() {
 
         override fun onReceive(context: Context, intent: Intent) {
             // 연결됐을 때
+            App.resumed = false
             Log.d("MAinActivity", intent.action.toString())
             if (ACTION_USB_PERMISSION == intent.action || UsbManager.ACTION_USB_DEVICE_ATTACHED == intent.action) {
                 synchronized(this) {
@@ -623,6 +650,7 @@ class Main2Activity : AppCompatActivity() {
 
             override fun onPostExecute(result: String?) {
                 super.onPostExecute(result)
+                App.resumed = true
             }
         }
     }
@@ -630,6 +658,8 @@ class Main2Activity : AppCompatActivity() {
     fun startMeasure(){
         loopChk = true
         thread = ThreadClass()
+        dialog = setProgressDialog(this, "Loading...")
+        dialog.show()
         thread.start()
 
     }
@@ -648,5 +678,50 @@ class Main2Activity : AppCompatActivity() {
         }
 
     }
+    fun setProgressDialog(context:Context, message:String):AlertDialog {
+        val llPadding = 30
+        val ll = LinearLayout(context)
+        ll.orientation = LinearLayout.HORIZONTAL
+        ll.setPadding(llPadding, llPadding, llPadding, llPadding)
+        ll.gravity = Gravity.CENTER
+        var llParam = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT)
+        llParam.gravity = Gravity.CENTER
+        ll.layoutParams = llParam
+
+        val progressBar = ProgressBar(context)
+        progressBar.isIndeterminate = true
+        progressBar.setPadding(0, 0, llPadding, 0)
+        progressBar.layoutParams = llParam
+
+        llParam = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        llParam.gravity = Gravity.CENTER
+        val tvText = TextView(context)
+        tvText.text = message
+        tvText.setTextColor(Color.parseColor("#000000"))
+        tvText.textSize = 20.toFloat()
+        tvText.layoutParams = llParam
+
+        ll.addView(progressBar)
+        ll.addView(tvText)
+
+        val builder = AlertDialog.Builder(context)
+        builder.setCancelable(true)
+        builder.setView(ll)
+
+        val dialog = builder.create()
+        val window = dialog.window
+        if (window != null) {
+            val layoutParams = WindowManager.LayoutParams()
+            layoutParams.copyFrom(dialog.window?.attributes)
+            layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT
+            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
+            dialog.window?.attributes = layoutParams
+        }
+        return dialog
+    }
+
 
 }

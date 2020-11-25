@@ -26,7 +26,6 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
-                android:text="test"
                 android:textSize="25sp"
                 android:layout_gravity="center_horizontal"
                 android:id="@+id/connect_title"
